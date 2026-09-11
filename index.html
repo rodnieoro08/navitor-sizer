@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#071422" />
+  <title>Navitor Vision Sizer</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo">NV</div>
+      <div>
+        <h1>Navitor Vision Sizer</h1>
+        <div class="sub">3mensio → size decision support · London MDT</div>
+      </div>
+    </div>
+    <div class="badge-row">
+      <span class="pill">Not official Abbott software</span>
+      <span class="pill warn">Heart Team decides</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="screen-input" class="screen active">
+      <div class="card">
+        <h2>Examples</h2>
+        <div class="examples">
+          <button type="button" data-ex="mid27">Straightforward 27</button>
+          <button type="button" data-ex="edge66">Boundary 66 mm</button>
+          <button type="button" data-ex="edge79">Boundary 79 mm</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Annulus</h2>
+        <p class="hint">Primary drivers. Perimeter is used first when sizes overlap.</p>
+        <div class="grid-2">
+          <div class="field"><label>Perimeter <span class="unit">mm</span></label><input id="peri" inputmode="decimal" placeholder="e.g. 74.2"></div>
+          <div class="field"><label>Area <span class="unit">mm²</span></label><input id="area" inputmode="decimal" placeholder="e.g. 448"></div>
+          <div class="field"><label>Mean diameter <span class="unit">mm</span></label><input id="meanD" inputmode="decimal" placeholder="e.g. 24.1"></div>
+          <div class="field"><label>Min / max Ø</label>
+            <div class="grid-2" style="gap:6px">
+              <input id="minD" inputmode="decimal" placeholder="min">
+              <input id="maxD" inputmode="decimal" placeholder="max">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Root · used on overlaps</h2>
+        <div class="grid-2">
+          <div class="field"><label>STJ diameter <span class="unit">mm</span></label><input id="stj" inputmode="decimal"></div>
+          <div class="field"><label>SOV height <span class="unit">mm</span></label><input id="sovH" inputmode="decimal" placeholder="≥15 all sizes"></div>
+          <div class="field"><label>SOV L / R / NC <span class="unit">mm</span></label>
+            <div class="grid-3">
+              <input id="sovL" inputmode="decimal" placeholder="L">
+              <input id="sovR" inputmode="decimal" placeholder="R">
+              <input id="sovNC" inputmode="decimal" placeholder="NC">
+            </div>
+          </div>
+          <div class="field"><label>Or SOV min width only</label><input id="sovMin" inputmode="decimal" placeholder="if not split"></div>
+          <div class="field"><label>LCA height <span class="unit">mm</span></label><input id="lca" inputmode="decimal"></div>
+          <div class="field"><label>RCA height <span class="unit">mm</span></label><input id="rca" inputmode="decimal"></div>
+          <div class="field"><label>LVOT Ø <span class="unit">mm</span></label><input id="lvot" inputmode="decimal"></div>
+          <div class="field"><label>Ascending aorta <span class="unit">mm</span></label><input id="aa" inputmode="decimal"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Access & calcium</h2>
+        <div class="field" style="margin-bottom:10px">
+          <label>Smallest access vessel <span class="unit">mm</span></label>
+          <input id="access" inputmode="decimal" placeholder="23/25 ≥5.0 · 27/29/35 ≥5.5">
+        </div>
+        <label>Annular calcium</label>
+        <div class="seg" id="calcAnn" style="margin:6px 0 12px">
+          <button type="button" data-v="none">None</button>
+          <button type="button" data-v="mild">Mild</button>
+          <button type="button" data-v="moderate">Mod</button>
+          <button type="button" data-v="severe">Severe</button>
+        </div>
+        <label>LVOT calcium</label>
+        <div class="seg" id="calcLvot" style="margin:6px 0 12px">
+          <button type="button" data-v="none">None</button>
+          <button type="button" data-v="mild">Mild</button>
+          <button type="button" data-v="moderate">Mod</button>
+          <button type="button" data-v="severe">Severe</button>
+        </div>
+        <label>STJ calcium</label>
+        <div class="seg" id="calcStj" style="margin:6px 0 4px">
+          <button type="button" data-v="none">None</button>
+          <button type="button" data-v="mild">Mild</button>
+          <button type="button" data-v="moderate">Mod</button>
+          <button type="button" data-v="severe">Severe</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Photo / PDF / paste</h2>
+        <p class="hint">PDF text is parsed when possible. Photos are a visual reference — confirm every number. Nothing leaves this phone.</p>
+        <label class="file-btn">Tap to attach 3mensio photo or PDF
+          <input id="file" type="file" accept="image/*,application/pdf">
+        </label>
+        <div id="img-preview" class="preview"></div>
+        <div class="field" style="margin-top:10px">
+          <label>Or paste report text</label>
+          <textarea id="paste" placeholder="Paste 3mensio measurements here"></textarea>
+        </div>
+        <div id="ocr-status" class="ocr-box"></div>
+        <div class="field" style="margin-top:8px">
+          <label>Free notes (not used in scoring)</label>
+          <textarea id="notes" placeholder="Bicuspid? Horizontal aorta? Prior PPM?"></textarea>
+        </div>
+      </div>
+
+      <button class="primary" id="btn-go" type="button">Recommend size</button>
+      <button class="secondary" id="btn-clear" type="button">Clear</button>
+      <p class="disclaimer">For personal / departmental decision support only. Not CE/UKCA marked. Do not use as the sole basis for implant size.</p>
+    </section>
+
+    <section id="screen-result" class="screen">
+      <div id="result-body" class="empty">Enter measurements and tap Recommend.</div>
+    </section>
+
+    <section id="screen-charts" class="screen">
+      <div class="card">
+        <h2>CT sizing chart</h2>
+        <p class="hint">Navitor Vision labelled use. Recommendation also driven by circular or elliptical geometry (ratio ≥ 0.73). If CT contraindicated, 3D TEE may be used.</p>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>mm</th><th>Mean Ø</th><th>Area</th><th>Peri</th><th>AA</th><th>SOV w</th><th>SOV h</th><th>Access</th>
+              </tr>
+            </thead>
+            <tbody id="chart-ifus"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Valve dimensions (fully expanded, unconstrained)</h2>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>mm</th><th>Inflow</th><th>Outflow</th><th>Stent Ø</th><th>Comm H</th><th>½ cell</th><th>Cuff</th><th>Stent H*</th>
+              </tr>
+            </thead>
+            <tbody id="chart-dims"></tbody>
+          </table>
+        </div>
+        <p class="hint">*Stent height excluding tabs. Source: Abbott didactic TRN1006420 OUS VER A.</p>
+      </div>
+    </section>
+
+    <section id="screen-logic" class="screen">
+      <div class="card logic">
+        <h2>How a size is chosen</h2>
+        <ol>
+          <li><b>Need one core number.</b> Perimeter, area or mean diameter. Best practice is all three from the same 3mensio systolic annulus trace.</li>
+          <li><b>Hard IFU filters.</b> A size is excluded if SOV min width is below the floor (25/27/29/31/34), SOV height &lt; 15 mm, or ascending aorta is outside that size’s range.</li>
+          <li><b>Range match.</b> Score 0.45 perimeter + 0.35 area + 0.20 mean Ø, using how central the value sits in the published range. Out-of-range values score negatively.</li>
+          <li><b>Overlap perimeters.</b> 66 · 72–73 · 79 · 85 mm belong to two sizes. Both stay candidates. The higher score wins only if the gap is ≥ 0.08; otherwise the app returns a co-primary pair for the Heart Team.</li>
+          <li><b>Tie-break penalties on the larger size</b> (and flags on both): ellipticity &lt; 0.73; min coronary height &lt; 12 mm (−0.15) or &lt; 10 mm (−0.35); SOV width &lt; 2 mm above floor; STJ &lt; labelled diameter; moderate/severe STJ calcium; severe LVOT calcium; access below FlexNav minimum.</li>
+          <li><b>Consistency check.</b> Perimeter-derived Ø = peri / π. Area-derived Ø = 2√(area/π). If these disagree with each other or with entered mean Ø by &gt; 2 mm, the result is flagged — fix the tracing before arguing about 25 vs 27.</li>
+          <li><b>Access.</b> 23 and 25 mm need ≥ 5.0 mm vessel. 27, 29 and 35 mm need ≥ 5.5 mm. Below that is a warning, not always an exclude (alternative access exists).</li>
+        </ol>
+      </div>
+      <div class="card logic">
+        <h2>Worked boundary rules</h2>
+        <ol>
+          <li><b>66 mm peri:</b> 23 and 25 both legal on peri. Prefer 25 if area ≥ 338 and mean Ø ≥ 21 and SOV ≥ 27 and coronaries comfortable. Prefer 23 if area stays in 277–346, SOV is tight for 25, LCA/RCA low, or STJ calcium is significant.</li>
+          <li><b>72–73 mm peri:</b> 25 and 27. 27 needs SOV ≥ 29 and access ≥ 5.5. If area is still ≤ 415 and mean Ø ≤ 23, 25 is usually cleaner.</li>
+          <li><b>79 mm peri:</b> 27 and 29. 29 needs SOV ≥ 31 and AA 32–42. Do not upsize if coronaries are low or STJ is small.</li>
+          <li><b>85 mm peri:</b> 29 and 35. 35 needs SOV ≥ 34 and mean Ø 27–30. 35 AA window is wide (27–44).</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h2>What this will not do</h2>
+        <p class="hint">It will not read a blurry theatre photo of a 3mensio monitor and implant a valve. It will not replace virtual valve / VTC in 3mensio for coronary obstruction. It will not size bicuspids, ViV, or non-Navitor platforms. It will not store identifiable patient data on a server.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <button class="active" data-screen="input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
+      Input
+    </button>
+    <button data-screen="result">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+      Result
+    </button>
+    <button data-screen="charts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18V6M10 18V10M16 18V8M22 18H2"/></svg>
+      Charts
+    </button>
+    <button data-screen="logic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+      Logic
+    </button>
+  </nav>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+  </script>
+  <script src="./app.js"></script>
+</body>
+</html>
