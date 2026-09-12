@@ -1,29 +1,40 @@
-# Navitor Vision Sizer (iPhone web app)
+# Navitor Vision Sizer
 
-Personal decision-support tool for Navitor Vision TAVI sizing from 3mensio numbers.
+Personal decision-support + proctor case card for Navitor Vision.
 
 Not official Abbott software. Not CE / UKCA marked. Heart Team decides.
+Do not upload patient photos or identifiable reports into this GitHub repo.
 
-## Use on iPhone tomorrow
+## Files to put in the GitHub repo root
 
-Best: put the folder on any HTTPS host (GitHub Pages, Netlify Drop, hospital intranet). Then:
+These must sit next to each other in the repo root, not inside another folder:
 
-1. Open the site in Safari (not Chrome).
-2. Share → Add to Home Screen.
-3. Open the icon. It runs full-screen and caches for offline MDT use.
+- index.html
+- app.js
+- case.js
+- styles.css
+- manifest.json
+- sw.js
+- icon.svg
 
-Without a host: AirDrop `navitor-sizer` to the iPhone, open `index.html` in Safari via Files. Add to Home Screen still works on recent iOS for local files less reliably; HTTPS is the robust path.
+Optional: README.md, DECISION_TREE.md
 
-## What to enter
+## Replace everything on GitHub
 
-Minimum: annulus perimeter **or** area **or** mean diameter.
+1. Unzip this archive on your computer.
+2. Open the repository on github.com.
+3. If files currently live in a nested folder, delete that extra folder first.
+4. Add file → Upload files, then drop the files listed above.
+5. Commit.
+6. Settings → Pages → Deploy from branch main, folder / (root).
+7. On iPhone open the site in Safari, pull to refresh, then Add to Home Screen again if needed.
 
-For boundary perimeters (66, 72–73, 79, 85 mm) also enter STJ, SOV widths, SOV height, coronary heights, LVOT, calcium grades, access.
+URL pattern: https://YOURUSERNAME.github.io/REPO-NAME/
 
-Photos are a visual reference. PDFs with real text can auto-fill fields — confirm every number.
+## This build includes
 
-## Files
-
-- `index.html` `styles.css` `app.js` — app
-- `DECISION_TREE.md` — full written algorithm
-- `manifest.json` `sw.js` `icon.svg` — home-screen / offline
+- Size recommendation from 3mensio numbers
+- Proctor case form
+- Sticker photos from Camera or iPhone library
+- On-device reading of sticker text / UDI
+- Share case text plus sticker photos to Apple Notes

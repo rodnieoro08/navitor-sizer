@@ -200,8 +200,23 @@
       </div>
 
       <div class="card">
+        <h2>Read stickers from photos</h2>
+        <p class="hint">One group photo of all three stickers is enough. Use <b>From library</b> for Camera Roll, or Camera. The app reads REF, UDI, LOT, SN and expiry on this phone — check every field.</p>
+        <div class="grid-2">
+          <label class="file-btn">From iPhone library
+            <input id="scanLib" type="file" accept="image/*" multiple>
+          </label>
+          <label class="file-btn">Take photo
+            <input id="scanCam" type="file" accept="image/*" capture="environment" multiple>
+          </label>
+        </div>
+        <div id="scan-status" class="ocr-box"></div>
+        <div id="scan-previews" class="preview"></div>
+      </div>
+
+      <div class="card">
         <h2>Stickers — Valve</h2>
-        <p class="hint">Photo is optional. Type REF + SN, or paste the UDI line from the sticker.</p>
+        <p class="hint">Auto-filled from the photo when possible. Correct anything that looks wrong.</p>
         <div class="grid-2">
           <div class="field"><label>REF</label>
             <select id="vRef">
@@ -214,9 +229,14 @@
           <div class="field"><label>Expiry</label><input id="vExp" placeholder="YYYY-MM-DD"></div>
           <div class="field"><label>UDI / barcode text</label><input id="vUdi" placeholder="(01)…(17)…(21)…"></div>
         </div>
-        <label class="file-btn" style="margin-top:10px">Photo of valve sticker
-          <input id="vPhoto" type="file" accept="image/*" capture="environment">
-        </label>
+        <div class="grid-2" style="margin-top:10px">
+          <label class="file-btn">Library
+            <input id="vPhotoLib" type="file" accept="image/*">
+          </label>
+          <label class="file-btn">Camera
+            <input id="vPhoto" type="file" accept="image/*" capture="environment">
+          </label>
+        </div>
         <img id="vPhotoImg" class="device-photo" alt="valve sticker">
       </div>
 
@@ -234,9 +254,14 @@
           <div class="field"><label>Expiry</label><input id="dExp"></div>
           <div class="field"><label>UDI / barcode text</label><input id="dUdi" placeholder="(01)…(17)…(10)…"></div>
         </div>
-        <label class="file-btn" style="margin-top:10px">Photo of FlexNav sticker
-          <input id="dPhoto" type="file" accept="image/*" capture="environment">
-        </label>
+        <div class="grid-2" style="margin-top:10px">
+          <label class="file-btn">Library
+            <input id="dPhotoLib" type="file" accept="image/*">
+          </label>
+          <label class="file-btn">Camera
+            <input id="dPhoto" type="file" accept="image/*" capture="environment">
+          </label>
+        </div>
         <img id="dPhotoImg" class="device-photo" alt="delivery sticker">
       </div>
 
@@ -254,16 +279,21 @@
           <div class="field"><label>Expiry</label><input id="lExp"></div>
           <div class="field"><label>UDI / barcode text</label><input id="lUdi"></div>
         </div>
-        <label class="file-btn" style="margin-top:10px">Photo of loading sticker
-          <input id="lPhoto" type="file" accept="image/*" capture="environment">
-        </label>
+        <div class="grid-2" style="margin-top:10px">
+          <label class="file-btn">Library
+            <input id="lPhotoLib" type="file" accept="image/*">
+          </label>
+          <label class="file-btn">Camera
+            <input id="lPhoto" type="file" accept="image/*" capture="environment">
+          </label>
+        </div>
         <img id="lPhotoImg" class="device-photo" alt="loading sticker">
       </div>
 
       <div class="card">
         <h2>Export to Apple Notes</h2>
-        <p class="hint">GitHub Pages cannot write into Notes by itself. Share or Copy, then choose Notes. Case data stays on this phone only.</p>
-        <button class="primary" id="btn-share" type="button">Share to Notes</button>
+        <p class="hint">Share sends the case card plus sticker photos you attached. On iPhone tap Notes. If iOS only takes the text, the photos are still in Camera Roll — drop them into the same note.</p>
+        <button class="primary" id="btn-share" type="button">Share text + photos to Notes</button>
         <button class="secondary" id="btn-copy" type="button">Copy case card</button>
         <button class="secondary" id="btn-pull-size" type="button">Pull measurements from Size tab</button>
         <button class="secondary" id="btn-new-case" type="button">Start new case</button>

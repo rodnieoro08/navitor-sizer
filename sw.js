@@ -1,4 +1,4 @@
-const CACHE = "navitor-sizer-v2";
+const CACHE = "navitor-sizer-v4";
 const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./case.js", "./manifest.json", "./icon.svg"];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
