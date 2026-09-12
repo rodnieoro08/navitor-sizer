@@ -498,7 +498,13 @@ function init() {
 
   $("btn-go").addEventListener("click", () => {
     const r = recommend(gather());
+    window.__lastRec = r;
     renderResult(r);
+    if (r.primary && $("cValveSize") && !$("cValveSize").value) {
+      $("cValveSize").value = r.coPrimary
+        ? `${r.primary.size.size} or ${r.coPrimary.size.size}`
+        : String(r.primary.size.size);
+    }
     showScreen("result");
   });
   $("btn-clear").addEventListener("click", () => loadExample("clear"));
@@ -517,6 +523,7 @@ function init() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
+  if (window.initCase) initCase();
 }
 
 document.addEventListener("DOMContentLoaded", init);

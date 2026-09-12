@@ -17,7 +17,7 @@
       <div class="logo">NV</div>
       <div>
         <h1>Navitor Vision Sizer</h1>
-        <div class="sub">3mensio → size decision support · London MDT</div>
+        <div class="sub">Sizer + proctor case card · export to Notes</div>
       </div>
     </div>
     <div class="badge-row">
@@ -125,6 +125,152 @@
       <p class="disclaimer">For personal / departmental decision support only. Not CE/UKCA marked. Do not use as the sole basis for implant size.</p>
     </section>
 
+    <section id="screen-case" class="screen">
+      <div class="card">
+        <h2>Case header</h2>
+        <div class="grid-2">
+          <div class="field"><label>Date</label><input id="cDate" type="date"></div>
+          <div class="field"><label>Hospital</label><input id="cHospital" placeholder="e.g. St Thomas'"></div>
+          <div class="field"><label>Operator 1</label><input id="cOp1"></div>
+          <div class="field"><label>Loader</label><input id="cLoader"></div>
+          <div class="field"><label>Operator 2</label><input id="cOp2"></div>
+          <div class="field"><label>TS</label><input id="cTs" placeholder="You / Abbott TS"></div>
+          <div class="field span2"><label>Clinical study</label><input id="cStudy" placeholder="or n/a"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Patient</h2>
+        <div class="grid-2">
+          <div class="field"><label>Age</label><input id="cAge" inputmode="numeric"></div>
+          <div class="field"><label>Rhythm</label><input id="cRhythm" placeholder="SR / AF / paced"></div>
+        </div>
+        <label style="margin-top:8px;display:block">Gender</label>
+        <div class="seg" id="cGender" style="grid-template-columns:1fr 1fr 1fr;margin-top:6px">
+          <button type="button" data-v="M">M</button>
+          <button type="button" data-v="F">F</button>
+          <button type="button" data-v="">—</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>3mensio / CT</h2>
+        <p class="hint">PD is auto-filled from perimeter (peri ÷ π) when you enter peri on the Size tab. You can override.</p>
+        <div class="grid-2">
+          <div class="field"><label>PD <span class="unit">mm</span></label><input id="cPd" inputmode="decimal"></div>
+          <div class="field"><label>Min / Max</label>
+            <div class="grid-2" style="gap:6px">
+              <input id="cMin" inputmode="decimal" placeholder="min">
+              <input id="cMax" inputmode="decimal" placeholder="max">
+            </div>
+          </div>
+          <div class="field"><label>Perimeter</label><input id="cPeri" inputmode="decimal"></div>
+          <div class="field"><label>LVOT</label><input id="cLvot" inputmode="decimal"></div>
+          <div class="field"><label>SOV</label><input id="cSov" placeholder="L / R / NC or min"></div>
+          <div class="field"><label>STJ</label><input id="cStj" inputmode="decimal"></div>
+          <div class="field"><label>LCA height</label><input id="cLca" inputmode="decimal"></div>
+          <div class="field"><label>RCA height</label><input id="cRca" inputmode="decimal"></div>
+          <div class="field span2"><label>Access</label><input id="cAccess" placeholder="e.g. R femoral 6.2 / 6.8 mm"></div>
+          <div class="field span2"><label>Anatomy</label><input id="cAnatomy" placeholder="tricuspid / bicuspid Sievers / horizontal aorta…"></div>
+        </div>
+        <label style="margin-top:10px;display:block">Ca++ by cusp</label>
+        <div class="cusp">
+          <div class="c" id="caN"><b>N</b></div>
+          <div class="c" id="caR"><b>R</b></div>
+          <div class="c" id="caL"><b>L</b></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Procedure</h2>
+        <div class="grid-2">
+          <div class="field"><label>Valve size</label><input id="cValveSize" placeholder="23 / 25 / 27 / 29 / 35"></div>
+          <div class="field"><label>BAV</label><input id="cBav" placeholder="yes / no / Sievers"></div>
+          <div class="field"><label>Balloon (pre)</label><input id="cBalloon" placeholder="e.g. 20 mm"></div>
+          <div class="field"><label>Sheath</label><input id="cSheath" placeholder="FlexNav integrated 14/15F"></div>
+          <div class="field"><label>Wire</label><input id="cWire" placeholder="e.g. Safari / Confida"></div>
+          <div class="field"><label>Recaptures</label><input id="cRecaptures" inputmode="numeric" placeholder="0"></div>
+          <div class="field"><label>Implant height</label><input id="cHeight" placeholder="e.g. 3 mm / Vision markers"></div>
+          <div class="field"><label>Post-dilation</label><input id="cPost" placeholder="no / balloon size"></div>
+          <div class="field"><label>PVL</label><input id="cPvl" placeholder="none / trace / mild…"></div>
+          <div class="field"><label>Gradient</label><input id="cGradient" placeholder="mean mmHg"></div>
+          <div class="field span2"><label>PPI</label><input id="cPpi" placeholder="no / yes — indication"></div>
+          <div class="field span2"><label>Comments</label><textarea id="cComments" placeholder="anything for Salesforce"></textarea></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Stickers — Valve</h2>
+        <p class="hint">Photo is optional. Type REF + SN, or paste the UDI line from the sticker.</p>
+        <div class="grid-2">
+          <div class="field"><label>REF</label>
+            <select id="vRef">
+              <option value="">Select</option>
+              <option>NVRO-23</option><option>NVRO-25</option><option>NVRO-27</option><option>NVRO-29</option><option>NVRO-35</option>
+              <option>NVTR-23</option><option>NVTR-25</option><option>NVTR-27</option><option>NVTR-29</option>
+            </select>
+          </div>
+          <div class="field"><label>Serial (SN)</label><input id="vSn" placeholder="e.g. 20860808"></div>
+          <div class="field"><label>Expiry</label><input id="vExp" placeholder="YYYY-MM-DD"></div>
+          <div class="field"><label>UDI / barcode text</label><input id="vUdi" placeholder="(01)…(17)…(21)…"></div>
+        </div>
+        <label class="file-btn" style="margin-top:10px">Photo of valve sticker
+          <input id="vPhoto" type="file" accept="image/*" capture="environment">
+        </label>
+        <img id="vPhotoImg" class="device-photo" alt="valve sticker">
+      </div>
+
+      <div class="card">
+        <h2>Stickers — Delivery system</h2>
+        <div class="grid-2">
+          <div class="field"><label>REF</label>
+            <select id="dRef">
+              <option value="">Select</option>
+              <option>FNAV-DS-SM</option>
+              <option>FNAV-DS-LG</option>
+            </select>
+          </div>
+          <div class="field"><label>LOT</label><input id="dLot"></div>
+          <div class="field"><label>Expiry</label><input id="dExp"></div>
+          <div class="field"><label>UDI / barcode text</label><input id="dUdi" placeholder="(01)…(17)…(10)…"></div>
+        </div>
+        <label class="file-btn" style="margin-top:10px">Photo of FlexNav sticker
+          <input id="dPhoto" type="file" accept="image/*" capture="environment">
+        </label>
+        <img id="dPhotoImg" class="device-photo" alt="delivery sticker">
+      </div>
+
+      <div class="card">
+        <h2>Stickers — Loading system</h2>
+        <div class="grid-2">
+          <div class="field"><label>REF</label>
+            <select id="lRef">
+              <option value="">Select</option>
+              <option>NVTR-LS-SM</option>
+              <option>NVTR-LS-LG</option>
+            </select>
+          </div>
+          <div class="field"><label>LOT</label><input id="lLot"></div>
+          <div class="field"><label>Expiry</label><input id="lExp"></div>
+          <div class="field"><label>UDI / barcode text</label><input id="lUdi"></div>
+        </div>
+        <label class="file-btn" style="margin-top:10px">Photo of loading sticker
+          <input id="lPhoto" type="file" accept="image/*" capture="environment">
+        </label>
+        <img id="lPhotoImg" class="device-photo" alt="loading sticker">
+      </div>
+
+      <div class="card">
+        <h2>Export to Apple Notes</h2>
+        <p class="hint">GitHub Pages cannot write into Notes by itself. Share or Copy, then choose Notes. Case data stays on this phone only.</p>
+        <button class="primary" id="btn-share" type="button">Share to Notes</button>
+        <button class="secondary" id="btn-copy" type="button">Copy case card</button>
+        <button class="secondary" id="btn-pull-size" type="button">Pull measurements from Size tab</button>
+        <button class="secondary" id="btn-new-case" type="button">Start new case</button>
+        <div id="note-preview" class="preview-note" style="margin-top:12px"></div>
+      </div>
+    </section>
+
     <section id="screen-result" class="screen">
       <div id="result-body" class="empty">Enter measurements and tap Recommend.</div>
     </section>
@@ -192,7 +338,11 @@
   <nav class="nav">
     <button class="active" data-screen="input">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
-      Input
+      Size
+    </button>
+    <button data-screen="case">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4h8v4H8zM6 8h12v12H6z"/><path d="M9 12h6M9 16h4"/></svg>
+      Case
     </button>
     <button data-screen="result">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
@@ -215,5 +365,6 @@
     }
   </script>
   <script src="./app.js"></script>
+  <script src="./case.js"></script>
 </body>
 </html>
