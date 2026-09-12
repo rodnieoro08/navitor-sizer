@@ -255,31 +255,69 @@ function toast(msg) {
   setTimeout(() => { el.style.display = "none"; }, 2200);
 }
 
+function noteTextFile(text) {
+  const stamp = ($("cDate") && $("cDate").value) || "case";
+  return new File([text], `Navitor-case-${stamp}.txt`, { type: "text/plain" });
+}
+
+function noteCardImage(text) {
+  return new Promise((resolve) => {
+    const lines = text.split("\n");
+    const pad = 28;
+    const lineH = 22;
+    const width = 900;
+    const height = pad * 2 + lines.length * lineH + 20;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = Math.max(height, 200);
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#0b1f33";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#1ac4c0";
+    ctx.font = "bold 22px -apple-system, sans-serif";
+    ctx.fillText("NAVITOR PROCTOR FORM", pad, pad + 8);
+    ctx.fillStyle = "#e8f1f8";
+    ctx.font = "16px ui-monospace, Menlo, monospace";
+    lines.forEach((line, i) => {
+      ctx.fillText(line.slice(0, 86), pad, pad + 36 + i * lineH);
+    });
+    canvas.toBlob((blob) => {
+      if (!blob) return resolve(null);
+      resolve(new File([blob], "Navitor-case-card.png", { type: "image/png" }));
+    }, "image/png");
+  });
+}
+
 async function shareToNotes() {
   const text = buildNote();
   previewNote();
   const title = `Navitor ${$("cHospital").value || "case"} ${$("cDate").value || ""}`.trim();
-  const files = stickerFiles.slice();
+  try { await navigator.clipboard.writeText(text); } catch (_) {}
+
+  const card = await noteCardImage(text);
+  const txt = noteTextFile(text);
+  const files = [txt];
+  if (card) files.push(card);
+  stickerFiles.forEach((f) => files.push(f));
+
   if (navigator.share) {
+    const withFiles = { title, text, files };
+    const textOnly = { title, text };
     try {
-      const payload = { title, text };
-      if (files.length && navigator.canShare && navigator.canShare({ files })) {
-        payload.files = files;
-      } else if (files.length) {
-        payload.files = files;
+      if (navigator.canShare && navigator.canShare({ files })) {
+        await navigator.share(withFiles);
+        toast("Shared case card + photos. If Notes shows only pictures, paste — the text is already copied.");
+        return;
       }
-      await navigator.share(payload);
-      if (!files.length) toast("Shared text only — add a sticker photo first to include images");
-      return;
     } catch (err) {
       if (err && err.name === "AbortError") return;
-      try {
-        await navigator.share({ title, text });
-        toast("Notes got the text. iOS blocked the photos — add them to the note from Camera Roll");
-        return;
-      } catch (err2) {
-        if (err2 && err2.name === "AbortError") return;
-      }
+    }
+    try {
+      await navigator.share(textOnly);
+      toast("Shared the written card. Add sticker photos from Camera Roll if they did not attach.");
+      return;
+    } catch (err2) {
+      if (err2 && err2.name === "AbortError") return;
     }
   }
   await copyCase();

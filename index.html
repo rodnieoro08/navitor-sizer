@@ -153,6 +153,9 @@
         </div>
       </div>
 
+      <button class="primary" id="btn-pull-size" type="button">Pull measurements from Size tab</button>
+      <p class="hint" style="margin:8px 0 12px">Copies peri, PD, min/max, LVOT, SOV, STJ, coronaries and access from the Size tab into 3mensio / CT below.</p>
+
       <div class="card">
         <h2>3mensio / CT</h2>
         <p class="hint">PD is auto-filled from perimeter (peri ÷ π) when you enter peri on the Size tab. You can override.</p>
@@ -292,10 +295,9 @@
 
       <div class="card">
         <h2>Export to Apple Notes</h2>
-        <p class="hint">Share sends the case card plus sticker photos you attached. On iPhone tap Notes. If iOS only takes the text, the photos are still in Camera Roll — drop them into the same note.</p>
+        <p class="hint">Share sends the written case card (text file + card image) and the sticker photos. iPhone often keeps only photos when both are sent — the card image is included so the form still appears. Text is also copied so you can paste into the same note.</p>
         <button class="primary" id="btn-share" type="button">Share text + photos to Notes</button>
         <button class="secondary" id="btn-copy" type="button">Copy case card</button>
-        <button class="secondary" id="btn-pull-size" type="button">Pull measurements from Size tab</button>
         <button class="secondary" id="btn-new-case" type="button">Start new case</button>
         <div id="note-preview" class="preview-note" style="margin-top:12px"></div>
       </div>
