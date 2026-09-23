@@ -15,7 +15,9 @@ const GTIN_REF = {
 const CASE_FIELDS = [
   "cDate","cHospital","cOp1","cLoader","cOp2","cTs","cStudy","cAge","cRhythm",
   "cPd","cMin","cMax","cPeri","cLvot","cSov","cStj","cLca","cRca","cAccess","cAnatomy",
-  "cValveSize","cBav","cBalloon","cSheath","cWire","cRecaptures","cHeight","cPost","cPvl","cGradient","cPpi","cComments",
+  "cVesselAccess","cAccessType","cBalloon","cBalloonDiam","cBalloonLen","cSheath","cWire","cPreGrad","cLvef","cPrevPpm","cHr","cRemarks",
+  "cValveSize","cProcSheath","cBav","cRecaptures","cHeight","cTechnique","cGradient","cComments",
+  "cPost","cPostSize","cPvl","cEcg","cPpi",
   "vRef","vSn","vExp","vUdi","dRef","dLot","dExp","dUdi","lRef","lLot","lExp","lUdi"
 ];
 
@@ -114,18 +116,37 @@ function buildNote() {
     line("Access", c.cAccess),
     line("Anatomy", c.cAnatomy),
     "",
+    "PRE-PROCEDURE",
+    line("Vessel access", c.cVesselAccess),
+    line("Sheath used", c.cSheath),
+    line("Access type", c.cAccessType),
+    line("Balloon (pre)", c.cBalloon),
+    line("Balloon diameter", c.cBalloonDiam),
+    line("Balloon length", c.cBalloonLen),
+    line("Wire used", c.cWire),
+    line("Pre-procedure gradient", c.cPreGrad),
+    line("LVEF", c.cLvef),
+    line("Previous PPM", c.cPrevPpm),
+    line("Heart rate", c.cHr),
+    line("Remarks", c.cRemarks),
+    "",
+    "PROCEDURE",
     line("Valve size", c.cValveSize),
+    line("Sheath", c.cProcSheath),
     recLine,
     line("BAV", c.cBav),
-    line("Balloon", c.cBalloon),
-    line("Sheath", c.cSheath),
-    line("Wire", c.cWire),
     line("Recaptures", c.cRecaptures),
     line("Implant height", c.cHeight),
-    line("Post-dilation", c.cPost),
-    line("PVL", c.cPvl),
+    line("Implant technique", c.cTechnique),
     line("Gradient", c.cGradient),
-    line("PPI", c.cPpi),
+    line("Comments", c.cComments),
+    "",
+    "POST-PROCEDURE",
+    line("Post-dil balloon", c.cPost),
+    line("Post-dil size", c.cPostSize),
+    line("Paravalvular leak", c.cPvl),
+    line("ECG", c.cEcg),
+    line("Required PPM", c.cPpi),
     "",
     "VALVE",
     [c.vRef, c.vSn && `SN ${c.vSn}`, c.vExp && `exp ${c.vExp}`].filter(Boolean).join("  ") || "—",
@@ -502,7 +523,9 @@ function applyDevices(devices) {
     if (m) $("cValveSize").value = m[1];
   }
   if (devices.delivery.ref && !$("cSheath").value) {
-    $("cSheath").value = devices.delivery.ref === "FNAV-DS-LG" ? "FlexNav LG 15F" : "FlexNav SM 14F";
+    const sh = devices.delivery.ref === "FNAV-DS-LG" ? "FlexNav LG 15F" : "FlexNav SM 14F";
+    $("cSheath").value = sh;
+    if ($("cProcSheath") && !$("cProcSheath").value) $("cProcSheath").value = sh;
   }
   return filled;
 }

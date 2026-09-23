@@ -185,20 +185,93 @@
       </div>
 
       <div class="card">
+        <h2>Pre-procedure</h2>
+        <div class="grid-2">
+          <div class="field"><label>Vessel access</label>
+            <select id="cVesselAccess">
+              <option value="">Select</option>
+              <option>Femoral</option>
+              <option>Transaxillary</option>
+              <option>Subclavian</option>
+              <option>Transcaval</option>
+              <option>Transcarotid</option>
+            </select>
+          </div>
+          <div class="field"><label>Sheath used</label><input id="cSheath" placeholder="e.g. FlexNav SM 14F / 16F"></div>
+          <div class="field"><label>Access type</label>
+            <select id="cAccessType">
+              <option value="">Select</option>
+              <option>Percutaneous puncture</option>
+              <option>Cutdown</option>
+            </select>
+          </div>
+          <div class="field"><label>Balloon (pre)</label>
+            <select id="cBalloon">
+              <option value="">Select</option>
+              <option>No</option>
+              <option>Yes</option>
+            </select>
+          </div>
+          <div class="field"><label>Diameter size</label><input id="cBalloonDiam" inputmode="decimal" placeholder="e.g. 20 mm"></div>
+          <div class="field"><label>Balloon length</label><input id="cBalloonLen" placeholder="e.g. 40 mm"></div>
+          <div class="field"><label>Wire used</label><input id="cWire" placeholder="e.g. Safari / Confida"></div>
+          <div class="field"><label>Pre-procedure gradient</label><input id="cPreGrad" inputmode="decimal" placeholder="mean mmHg"></div>
+          <div class="field"><label>LVEF</label><input id="cLvef" inputmode="decimal" placeholder="%"></div>
+          <div class="field"><label>Previous PPM</label>
+            <select id="cPrevPpm">
+              <option value="">Select</option>
+              <option>No</option>
+              <option>Yes</option>
+            </select>
+          </div>
+          <div class="field"><label>Heart rate</label><input id="cHr" inputmode="numeric" placeholder="bpm"></div>
+          <div class="field span2"><label>Remarks</label><textarea id="cRemarks" placeholder="pre-procedure remarks"></textarea></div>
+        </div>
+      </div>
+
+      <div class="card">
         <h2>Procedure</h2>
         <div class="grid-2">
           <div class="field"><label>Valve size</label><input id="cValveSize" placeholder="23 / 25 / 27 / 29 / 35"></div>
+          <div class="field"><label>Sheath</label><input id="cProcSheath" placeholder="e.g. FlexNav SM 14F"></div>
           <div class="field"><label>BAV</label><input id="cBav" placeholder="yes / no / Sievers"></div>
-          <div class="field"><label>Balloon (pre)</label><input id="cBalloon" placeholder="e.g. 20 mm"></div>
-          <div class="field"><label>Sheath</label><input id="cSheath" placeholder="FlexNav integrated 14/15F"></div>
-          <div class="field"><label>Wire</label><input id="cWire" placeholder="e.g. Safari / Confida"></div>
           <div class="field"><label>Recaptures</label><input id="cRecaptures" inputmode="numeric" placeholder="0"></div>
           <div class="field"><label>Implant height</label><input id="cHeight" placeholder="e.g. 3 mm / Vision markers"></div>
-          <div class="field"><label>Post-dilation</label><input id="cPost" placeholder="no / balloon size"></div>
-          <div class="field"><label>PVL</label><input id="cPvl" placeholder="none / trace / mild…"></div>
+          <div class="field"><label>Implant technique</label><input id="cTechnique" placeholder="e.g. cusp overlap / 3-cusp"></div>
           <div class="field"><label>Gradient</label><input id="cGradient" placeholder="mean mmHg"></div>
-          <div class="field span2"><label>PPI</label><input id="cPpi" placeholder="no / yes — indication"></div>
           <div class="field span2"><label>Comments</label><textarea id="cComments" placeholder="anything for Salesforce"></textarea></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Post-procedure</h2>
+        <div class="grid-2">
+          <div class="field"><label>Post-dil balloon</label>
+            <select id="cPost">
+              <option value="">Select</option>
+              <option>No</option>
+              <option>Yes</option>
+            </select>
+          </div>
+          <div class="field"><label>Size</label><input id="cPostSize" placeholder="e.g. 23 mm"></div>
+          <div class="field"><label>Paravalvular leak</label>
+            <select id="cPvl">
+              <option value="">Select</option>
+              <option>None</option>
+              <option>Trace</option>
+              <option>Mild</option>
+              <option>Moderate</option>
+              <option>Severe</option>
+            </select>
+          </div>
+          <div class="field"><label>ECG</label><input id="cEcg" placeholder="e.g. SR / LBBB / RBBB"></div>
+          <div class="field"><label>Required PPM</label>
+            <select id="cPpi">
+              <option value="">Select</option>
+              <option>No</option>
+              <option>Yes</option>
+            </select>
+          </div>
         </div>
       </div>
 
