@@ -212,7 +212,7 @@
               <option>Yes</option>
             </select>
           </div>
-          <div class="field"><label>Diameter size</label><input id="cBalloonDiam" inputmode="decimal" placeholder="e.g. 20 mm"></div>
+          <div class="field"><label>Diameter size and name</label><input id="cBalloonDiam" placeholder="e.g. 20 mm True Dilatation"></div>
           <div class="field"><label>Balloon length</label><input id="cBalloonLen" placeholder="e.g. 40 mm"></div>
           <div class="field"><label>Wire used</label><input id="cWire" placeholder="e.g. Safari / Confida"></div>
           <div class="field"><label>Pre-procedure gradient</label><input id="cPreGrad" inputmode="decimal" placeholder="mean mmHg"></div>
@@ -238,8 +238,6 @@
           <div class="field"><label>Recaptures</label><input id="cRecaptures" inputmode="numeric" placeholder="0"></div>
           <div class="field"><label>Implant height</label><input id="cHeight" placeholder="e.g. 3 mm / Vision markers"></div>
           <div class="field"><label>Implant technique</label><input id="cTechnique" placeholder="e.g. cusp overlap / 3-cusp"></div>
-          <div class="field"><label>Gradient</label><input id="cGradient" placeholder="mean mmHg"></div>
-          <div class="field span2"><label>Comments</label><textarea id="cComments" placeholder="anything for Salesforce"></textarea></div>
         </div>
       </div>
 
@@ -264,6 +262,7 @@
               <option>Severe</option>
             </select>
           </div>
+          <div class="field"><label>Gradient</label><input id="cGradient" placeholder="mean mmHg"></div>
           <div class="field"><label>ECG</label><input id="cEcg" placeholder="e.g. SR / LBBB / RBBB"></div>
           <div class="field"><label>Required PPM</label>
             <select id="cPpi">
@@ -272,6 +271,7 @@
               <option>Yes</option>
             </select>
           </div>
+          <div class="field span2"><label>Comments</label><textarea id="cComments" placeholder="post-procedure comments"></textarea></div>
         </div>
       </div>
 
@@ -303,7 +303,7 @@
           </div>
           <div class="field"><label>Serial (SN)</label><input id="vSn" placeholder="e.g. 20860808"></div>
           <div class="field"><label>Expiry</label><input id="vExp" placeholder="YYYY-MM-DD"></div>
-          <div class="field"><label>UDI / barcode text</label><input id="vUdi" placeholder="(01)…(17)…(21)…"></div>
+          <input id="vUdi" type="hidden">
         </div>
         <div class="grid-2" style="margin-top:10px">
           <label class="file-btn">Library
@@ -328,7 +328,7 @@
           </div>
           <div class="field"><label>LOT</label><input id="dLot"></div>
           <div class="field"><label>Expiry</label><input id="dExp"></div>
-          <div class="field"><label>UDI / barcode text</label><input id="dUdi" placeholder="(01)…(17)…(10)…"></div>
+          <input id="dUdi" type="hidden">
         </div>
         <div class="grid-2" style="margin-top:10px">
           <label class="file-btn">Library
@@ -353,7 +353,7 @@
           </div>
           <div class="field"><label>LOT</label><input id="lLot"></div>
           <div class="field"><label>Expiry</label><input id="lExp"></div>
-          <div class="field"><label>UDI / barcode text</label><input id="lUdi"></div>
+          <input id="lUdi" type="hidden">
         </div>
         <div class="grid-2" style="margin-top:10px">
           <label class="file-btn">Library
