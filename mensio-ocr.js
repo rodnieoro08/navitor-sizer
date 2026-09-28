@@ -12,6 +12,48 @@ function firstNum(re, text) {
   return m ? parseFloat(m[1]) : null;
 }
 
+function parseSov(text) {
+  const t = String(text || "");
+  const u = t.toUpperCase();
+  const blockMatch = u.match(/SINUS\s*OF\s*VALSALVA[\s\S]{0,400}/);
+  const block = blockMatch ? blockMatch[0] : u;
+  let sovL = fixDec(
+    firstNum(/SOV\s*L(?:EFT)?[^0-9]{0,16}(\d+\.?\d*)/i, t) ||
+    firstNum(/\bLEFT(?:\s*CORONARY)?(?:\s*CUSP)?[^0-9]{0,16}(\d+\.?\d*)/i, block) ||
+    firstNum(/\bLCC[^0-9]{0,12}(\d+\.?\d*)/i, block) ||
+    firstNum(/\bL\s*[:.]\s*(\d+\.?\d*)/i, block),
+    20, 50
+  );
+  let sovR = fixDec(
+    firstNum(/SOV\s*R(?:IGHT)?[^0-9]{0,16}(\d+\.?\d*)/i, t) ||
+    firstNum(/\bRIGHT(?:\s*CORONARY)?(?:\s*CUSP)?[^0-9]{0,16}(\d+\.?\d*)/i, block) ||
+    firstNum(/\bRCC[^0-9]{0,12}(\d+\.?\d*)/i, block) ||
+    firstNum(/\bR\s*[:.]\s*(\d+\.?\d*)/i, block),
+    20, 50
+  );
+  let sovNC = fixDec(
+    firstNum(/SOV\s*N(?:C|ON)?[^0-9]{0,16}(\d+\.?\d*)/i, t) ||
+    firstNum(/NON[\s\-]*CORONARY[^0-9]{0,16}(\d+\.?\d*)/i, block) ||
+    firstNum(/\bNCC[^0-9]{0,12}(\d+\.?\d*)/i, block) ||
+    firstNum(/\bNC\s*[:.]\s*(\d+\.?\d*)/i, block),
+    20, 50
+  );
+  if (sovL == null || sovR == null || sovNC == null) {
+    const triple = block.match(/DIAMETERS?[^0-9]{0,40}(\d+\.?\d*)[^0-9]{1,20}(\d+\.?\d*)[^0-9]{1,20}(\d+\.?\d*)/i);
+    if (triple) {
+      const a = fixDec(parseFloat(triple[1]), 20, 50);
+      const b = fixDec(parseFloat(triple[2]), 20, 50);
+      const c = fixDec(parseFloat(triple[3]), 20, 50);
+      if (sovL == null) sovL = a;
+      if (sovR == null) sovR = b;
+      if (sovNC == null) sovNC = c;
+    }
+  }
+  const nums = [sovL, sovR, sovNC].filter((v) => v != null);
+  const sovMin = nums.length ? Math.min.apply(null, nums) : null;
+  return { sovL, sovR, sovNC, sovMin };
+}
+
 function parseMensio(text) {
   const raw = String(text || "");
   const t = raw.replace(/,/g, ".").replace(/mm\s*[\u00b22]/gi, " mm2");
@@ -34,8 +76,7 @@ function parseMensio(text) {
   );
   const stj = fixDec(
     firstNum(/STJ\s*[\u00d8\u00f8O:][^0-9]{0,16}(\d+\.?\d*)/i, t) ||
-    firstNum(/STJ[^0-9]{0,16}(\d+\.?\d*)/i, t) ||
-    firstNum(/P\s*D[^\n]{0,40}?(\d+\.\d+)\s*M/i, u),
+    firstNum(/STJ[^0-9]{0,16}(\d+\.?\d*)/i, t),
     18, 50
   );
   const aa = fixDec(
@@ -57,18 +98,23 @@ function parseMensio(text) {
   );
   const minD = fixDec(firstNum(/MIN\s*[\u00d8\u00f8O][^0-9]{0,12}(\d+\.?\d*)/i, t), 14, 34);
   const maxD = fixDec(firstNum(/MAX\s*[\u00d8\u00f8O][^0-9]{0,12}(\d+\.?\d*)/i, t), 16, 40);
-  const sovH = fixDec(firstNum(/VALSALVA HEIGHT[^0-9]{0,16}(\d+\.?\d*)/i, t), 10, 30);
-  const sovL = fixDec(firstNum(/SINUS OF VALSALVA[\s\S]{0,80}?LEFT[^0-9]{0,16}(\d+\.?\d*)/i, t), 20, 50);
-  const sovR = fixDec(firstNum(/SINUS OF VALSALVA[\s\S]{0,120}?RIGHT[^0-9]{0,16}(\d+\.?\d*)/i, t), 20, 50);
-  const sovNC = fixDec(firstNum(/SINUS OF VALSALVA[\s\S]{0,160}?NON[^0-9]{0,16}(\d+\.?\d*)/i, t), 20, 50);
-  return { peri, periPD, area, meanD, minD, maxD, stj, lca, rca, aa, lvot, sovH, sovL, sovR, sovNC };
+  const sovH = fixDec(
+    firstNum(/VALSALVA HEIGHT[^0-9]{0,16}(\d+\.?\d*)/i, t) ||
+    firstNum(/SOV\s*HEIGHT[^0-9]{0,16}(\d+\.?\d*)/i, t),
+    10, 30
+  );
+  const sov = parseSov(t);
+  return {
+    peri, periPD, area, meanD, minD, maxD, stj, lca, rca, aa, lvot, sovH,
+    sovL: sov.sovL, sovR: sov.sovR, sovNC: sov.sovNC, sovMin: sov.sovMin
+  };
 }
 
 function applyMensio(p) {
   const map = {
     peri: "peri", periPD: "periPD", area: "area", meanD: "meanD",
     minD: "minD", maxD: "maxD", stj: "stj", lca: "lca", rca: "rca",
-    aa: "aa", lvot: "lvot", sovH: "sovH", sovL: "sovL", sovR: "sovR", sovNC: "sovNC"
+    aa: "aa", lvot: "lvot", sovH: "sovH", sovL: "sovL", sovR: "sovR", sovNC: "sovNC", sovMin: "sovMin"
   };
   let n = 0;
   Object.entries(map).forEach(([k, id]) => {
