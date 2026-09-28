@@ -87,6 +87,7 @@ input:focus, select:focus, textarea:focus {
   outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-dim);
 }
 textarea { min-height: 72px; font-size: 14px; resize: vertical; }
+input[readonly] { color: var(--teal); background: #0a1c2e; }
 .unit { font-weight: 500; color: #6d8aa3; }
 
 .seg {
