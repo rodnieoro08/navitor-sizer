@@ -46,13 +46,13 @@
           <div class="field"><label>Perimeter-derived diameter <span class="unit">mm</span></label>
             <input id="periPD" inputmode="decimal" readonly placeholder="peri ÷ π">
           </div>
-          <div class="field"><label>Mean diameter <span class="unit">mm</span></label><input id="meanD" inputmode="decimal" placeholder="e.g. 24.1"></div>
           <div class="field"><label>Min / max Ø</label>
             <div class="grid-2" style="gap:6px">
               <input id="minD" inputmode="decimal" placeholder="min">
               <input id="maxD" inputmode="decimal" placeholder="max">
             </div>
           </div>
+          <div class="field"><label>Mean diameter <span class="unit">mm</span></label><input id="meanD" inputmode="decimal" placeholder="e.g. 24.1"></div>
         </div>
       </div>
 
@@ -75,11 +75,48 @@
           <div class="field"><label>Ascending aorta <span class="unit">mm</span></label><input id="aa" inputmode="decimal"></div>
         </div>
       </div>
-      PLACEHOLDER_CONTINUE
+
+      <div id="mount-size"></div>
     </section>
+    <div id="mount-rest"></div>
   </main>
-  <script src="./app.js"></script>
-  <script src="./case.js"></script>
-  <script src="./peri-pd.js"></script>
+  <div id="mount-nav"></div>
+
+  <script>
+  (async function () {
+    async function put(id, file) {
+      const el = document.getElementById(id);
+      const t = await (await fetch(file, { cache: "no-store" })).text();
+      el.insertAdjacentHTML("beforeend", t);
+    }
+    try {
+      await put("mount-size", "./frag-size-tail.html");
+      await put("mount-rest", "./frag-case-a.html");
+      await put("mount-rest", "./frag-case-b.html");
+      await put("mount-rest", "./frag-result.html");
+      await put("mount-rest", "./frag-charts.html");
+      await put("mount-rest", "./frag-logic.html");
+      await put("mount-nav", "./frag-nav.html");
+    } catch (err) {
+      console.error(err);
+    }
+    function add(src) {
+      return new Promise((res, rej) => {
+        const s = document.createElement("script");
+        s.src = src;
+        s.onload = res;
+        s.onerror = rej;
+        document.body.appendChild(s);
+      });
+    }
+    await add("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+    await add("./app.js");
+    await add("./case.js");
+    await add("./peri-pd.js");
+  })();
+  </script>
 </body>
 </html>
