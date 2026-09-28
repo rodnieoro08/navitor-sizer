@@ -25,6 +25,7 @@
       <span class="pill warn">Heart Team decides</span>
     </div>
   </header>
+
   <main class="wrap">
     <section id="screen-input" class="screen active">
       <div class="card">
@@ -35,6 +36,7 @@
           <button type="button" data-ex="edge79">Boundary 79 mm</button>
         </div>
       </div>
+
       <div class="card">
         <h2>Annulus</h2>
         <p class="hint">Primary drivers. Perimeter is used first when sizes overlap.</p>
@@ -53,5 +55,31 @@
           </div>
         </div>
       </div>
-      <script src="./peri-pd.js"></script>
-      <p class="hint">If the derived-diameter box is empty, type perimeter and it fills automatically (peri ÷ π, 1 decimal).</p>
+
+      <div class="card">
+        <h2>Root · used on overlaps</h2>
+        <div class="grid-2">
+          <div class="field"><label>STJ diameter <span class="unit">mm</span></label><input id="stj" inputmode="decimal"></div>
+          <div class="field"><label>SOV height <span class="unit">mm</span></label><input id="sovH" inputmode="decimal" placeholder="≥15 all sizes"></div>
+          <div class="field"><label>SOV L / R / NC <span class="unit">mm</span></label>
+            <div class="grid-3">
+              <input id="sovL" inputmode="decimal" placeholder="L">
+              <input id="sovR" inputmode="decimal" placeholder="R">
+              <input id="sovNC" inputmode="decimal" placeholder="NC">
+            </div>
+          </div>
+          <div class="field"><label>Or SOV min width only</label><input id="sovMin" inputmode="decimal" placeholder="if not split"></div>
+          <div class="field"><label>LCA height <span class="unit">mm</span></label><input id="lca" inputmode="decimal"></div>
+          <div class="field"><label>RCA height <span class="unit">mm</span></label><input id="rca" inputmode="decimal"></div>
+          <div class="field"><label>LVOT Ø <span class="unit">mm</span></label><input id="lvot" inputmode="decimal"></div>
+          <div class="field"><label>Ascending aorta <span class="unit">mm</span></label><input id="aa" inputmode="decimal"></div>
+        </div>
+      </div>
+      PLACEHOLDER_CONTINUE
+    </section>
+  </main>
+  <script src="./app.js"></script>
+  <script src="./case.js"></script>
+  <script src="./peri-pd.js"></script>
+</body>
+</html>
