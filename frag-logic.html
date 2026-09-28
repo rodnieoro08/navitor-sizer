@@ -1,0 +1,27 @@
+<section id="screen-logic" class="screen">
+      <div class="card logic">
+        <h2>How a size is chosen</h2>
+        <ol>
+          <li><b>Need one core number.</b> Perimeter, area or mean diameter. Best practice is all three from the same 3mensio systolic annulus trace.</li>
+          <li><b>Hard IFU filters.</b> A size is excluded if SOV min width is below the floor (25/27/29/31/34), SOV height < 15 mm, or ascending aorta is outside that size’s range.</li>
+          <li><b>Range match.</b> Score 0.45 perimeter + 0.35 area + 0.20 mean Ø, using how central the value sits in the published range. Out-of-range values score negatively.</li>
+          <li><b>Overlap perimeters.</b> 66 · 72–73 · 79 · 85 mm belong to two sizes. Both stay candidates. The higher score wins only if the gap is ≥ 0.08; otherwise the app returns a co-primary pair for the Heart Team.</li>
+          <li><b>Tie-break penalties on the larger size</b> (and flags on both): ellipticity < 0.73; min coronary height < 12 mm (−0.15) or < 10 mm (−0.35); SOV width < 2 mm above floor; STJ < labelled diameter; moderate/severe STJ calcium; severe LVOT calcium; access below FlexNav minimum.</li>
+          <li><b>Consistency check.</b> Perimeter-derived Ø = peri / π. Area-derived Ø = 2√(area/π). If these disagree with each other or with entered mean Ø by > 2 mm, the result is flagged — fix the tracing before arguing about 25 vs 27.</li>
+          <li><b>Access.</b> 23 and 25 mm need ≥ 5.0 mm vessel. 27, 29 and 35 mm need ≥ 5.5 mm. Below that is a warning, not always an exclude (alternative access exists).</li>
+        </ol>
+      </div>
+      <div class="card logic">
+        <h2>Worked boundary rules</h2>
+        <ol>
+          <li><b>66 mm peri:</b> 23 and 25 both legal on peri. Prefer 25 if area ≥ 338 and mean Ø ≥ 21 and SOV ≥ 27 and coronaries comfortable. Prefer 23 if area stays in 277–346, SOV is tight for 25, LCA/RCA low, or STJ calcium is significant.</li>
+          <li><b>72–73 mm peri:</b> 25 and 27. 27 needs SOV ≥ 29 and access ≥ 5.5. If area is still ≤ 415 and mean Ø ≤ 23, 25 is usually cleaner.</li>
+          <li><b>79 mm peri:</b> 27 and 29. 29 needs SOV ≥ 31 and AA 32–42. Do not upsize if coronaries are low or STJ is small.</li>
+          <li><b>85 mm peri:</b> 29 and 35. 35 needs SOV ≥ 34 and mean Ø 27–30. 35 AA window is wide (27–44).</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h2>What this will not do</h2>
+        <p class="hint">It will not read a blurry theatre photo of a 3mensio monitor and implant a valve. It will not replace virtual valve / VTC in 3mensio for coronary obstruction. It will not size bicuspids, ViV, or non-Navitor platforms. It will not store identifiable patient data on a server.</p>
+      </div>
+    </section>
