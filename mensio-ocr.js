@@ -54,6 +54,24 @@ function parseSov(text) {
   return { sovL, sovR, sovNC, sovMin };
 }
 
+function parseCoronaries(text) {
+  const t = String(text || "");
+  const lca = fixDec(
+    firstNum(/L\s*C\s*A\s*HEIGHT[^0-9]{0,20}(\d+\.?\d*)/i, t) ||
+    firstNum(/LEFT\s*(?:MAIN|CORONARY)(?:\s*HEIGHT)?[^0-9]{0,20}(\d+\.?\d*)/i, t) ||
+    firstNum(/\bLMS\s*HEIGHT[^0-9]{0,16}(\d+\.?\d*)/i, t) ||
+    firstNum(/LCA[^0-9]{0,20}(\d+\.?\d*)/i, t),
+    6, 28
+  );
+  const rca = fixDec(
+    firstNum(/R\s*C\s*A\s*HEIGHT[^0-9]{0,20}(\d+\.?\d*)/i, t) ||
+    firstNum(/RIGHT\s*CORONARY(?:\s*HEIGHT)?[^0-9]{0,20}(\d+\.?\d*)/i, t) ||
+    firstNum(/RCA[^0-9]{0,20}(\d+\.?\d*)/i, t),
+    6, 28
+  );
+  return { lca, rca };
+}
+
 function parseMensio(text) {
   const raw = String(text || "");
   const t = raw.replace(/,/g, ".").replace(/mm\s*[\u00b22]/gi, " mm2");
@@ -89,8 +107,7 @@ function parseMensio(text) {
     firstNum(/LVOT[^0-9]{0,16}(\d+\.?\d*)/i, t),
     16, 40
   );
-  const lca = fixDec(firstNum(/LCA\s*HEIGHT[^0-9]{0,16}(\d+\.?\d*)/i, t), 6, 30);
-  const rca = fixDec(firstNum(/RCA\s*HEIGHT[^0-9]{0,16}(\d+\.?\d*)/i, t), 6, 30);
+  const cor = parseCoronaries(t);
   const meanD = fixDec(
     firstNum(/MEAN(?:\s*DIAMETER)?[^0-9]{0,16}(\d+\.?\d*)/i, t) ||
     firstNum(/AVERAGE\s*[\u00d8\u00f8O][^0-9]{0,12}(\d+\.?\d*)/i, t),
@@ -105,7 +122,9 @@ function parseMensio(text) {
   );
   const sov = parseSov(t);
   return {
-    peri, periPD, area, meanD, minD, maxD, stj, lca, rca, aa, lvot, sovH,
+    peri, periPD, area, meanD, minD, maxD, stj,
+    lca: cor.lca, rca: cor.rca,
+    aa, lvot, sovH,
     sovL: sov.sovL, sovR: sov.sovR, sovNC: sov.sovNC, sovMin: sov.sovMin
   };
 }
