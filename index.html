@@ -36,7 +36,6 @@
           <button type="button" data-ex="edge79">Boundary 79 mm</button>
         </div>
       </div>
-
       <div class="card">
         <h2>Annulus</h2>
         <p class="hint">Primary drivers. Perimeter is used first when sizes overlap.</p>
@@ -55,7 +54,6 @@
           <div class="field"><label>Mean diameter <span class="unit">mm</span></label><input id="meanD" inputmode="decimal" placeholder="e.g. 24.1"></div>
         </div>
       </div>
-
       <div class="card">
         <h2>Root · used on overlaps</h2>
         <div class="grid-2">
@@ -75,10 +73,12 @@
           <div class="field"><label>Ascending aorta <span class="unit">mm</span></label><input id="aa" inputmode="decimal"></div>
         </div>
       </div>
-
       <div id="mount-size"></div>
     </section>
-    <div id="mount-rest"></div>
+    <section id="screen-case" class="screen"><div id="mount-case"></div></section>
+    <section id="screen-result" class="screen"><div id="result-body" class="empty">Enter measurements and tap Recommend.</div></section>
+    <section id="screen-charts" class="screen"><div id="mount-charts"></div></section>
+    <section id="screen-logic" class="screen"><div id="mount-logic"></div></section>
   </main>
   <div id="mount-nav"></div>
 
@@ -91,11 +91,10 @@
     }
     try {
       await put("mount-size", "./frag-size-tail.html");
-      await put("mount-rest", "./frag-case-a.html");
-      await put("mount-rest", "./frag-case-b.html");
-      await put("mount-rest", "./frag-result.html");
-      await put("mount-rest", "./frag-charts.html");
-      await put("mount-rest", "./frag-logic.html");
+      await put("mount-case", "./frag-case-a.html");
+      await put("mount-case", "./frag-case-b.html");
+      await put("mount-charts", "./frag-charts.html");
+      await put("mount-logic", "./frag-logic.html");
       await put("mount-nav", "./frag-nav.html");
     } catch (err) {
       console.error(err);
@@ -117,7 +116,6 @@
     await add("./case.js");
     await add("./peri-pd.js");
     if (typeof init === "function") init();
-    else if (typeof window.init === "function") window.init();
   })();
   </script>
 </body>
