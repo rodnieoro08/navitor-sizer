@@ -116,6 +116,8 @@
     await add("./app.js");
     await add("./case.js");
     await add("./peri-pd.js");
+    if (typeof init === "function") init();
+    else if (typeof window.init === "function") window.init();
   })();
   </script>
 </body>
