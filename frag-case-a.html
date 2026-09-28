@@ -1,0 +1,112 @@
+<section id="screen-case" class="screen">
+      <button class="primary" id="btn-new-case" type="button">Start new case</button>
+      <p class="hint" style="margin:8px 0 12px">Clears this case card. Size-tab numbers stay.</p>
+      <div class="card">
+        <h2>Case header</h2>
+        <div class="grid-2">
+          <div class="field"><label>Date</label><input id="cDate" type="date"></div>
+          <div class="field"><label>Hospital</label><input id="cHospital" placeholder="e.g. St Thomas'"></div>
+          <div class="field"><label>Operator 1</label><input id="cOp1"></div>
+          <div class="field"><label>Loader</label><input id="cLoader"></div>
+          <div class="field"><label>Operator 2</label><input id="cOp2"></div>
+          <div class="field"><label>TS</label><input id="cTs" placeholder="You / Abbott TS"></div>
+          <div class="field span2"><label>Clinical study</label><input id="cStudy" placeholder="or n/a"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Patient</h2>
+        <div class="grid-2">
+          <div class="field"><label>Age</label><input id="cAge" inputmode="numeric"></div>
+          <div class="field"><label>Rhythm</label><input id="cRhythm" placeholder="SR / AF / paced"></div>
+        </div>
+        <label style="margin-top:8px;display:block">Gender</label>
+        <div class="seg" id="cGender" style="grid-template-columns:1fr 1fr 1fr;margin-top:6px">
+          <button type="button" data-v="M">M</button>
+          <button type="button" data-v="F">F</button>
+          <button type="button" data-v="">—</button>
+        </div>
+      </div>
+      <button class="primary" id="btn-pull-size" type="button">Pull measurements from Size tab</button>
+      <p class="hint" style="margin:8px 0 12px">Copies peri, PD, min/max, LVOT, SOV, STJ, coronaries and access from the Size tab into 3mensio / CT below.</p>
+      <div class="card">
+        <h2>3mensio / CT</h2>
+        <p class="hint">PD is auto-filled from perimeter (peri ÷ π) when you enter peri on the Size tab. You can override.</p>
+        <div class="grid-2">
+          <div class="field"><label>PD <span class="unit">mm</span></label><input id="cPd" inputmode="decimal"></div>
+          <div class="field"><label>Min / Max</label>
+            <div class="grid-2" style="gap:6px">
+              <input id="cMin" inputmode="decimal" placeholder="min">
+              <input id="cMax" inputmode="decimal" placeholder="max">
+            </div>
+          </div>
+          <div class="field"><label>Perimeter</label><input id="cPeri" inputmode="decimal"></div>
+          <div class="field"><label>LVOT</label><input id="cLvot" inputmode="decimal"></div>
+          <div class="field"><label>SOV</label><input id="cSov" placeholder="L / R / NC or min"></div>
+          <div class="field"><label>STJ</label><input id="cStj" inputmode="decimal"></div>
+          <div class="field"><label>LCA height</label><input id="cLca" inputmode="decimal"></div>
+          <div class="field"><label>RCA height</label><input id="cRca" inputmode="decimal"></div>
+          <div class="field span2"><label>Access</label><input id="cAccess" placeholder="e.g. R femoral 6.2 / 6.8 mm"></div>
+          <div class="field span2"><label>Anatomy</label><input id="cAnatomy" placeholder="tricuspid / bicuspid Sievers / horizontal aorta…"></div>
+        </div>
+        <label style="margin-top:10px;display:block">Ca++ by cusp</label>
+        <div class="cusp">
+          <div class="c" id="caN"><b>N</b></div>
+          <div class="c" id="caR"><b>R</b></div>
+          <div class="c" id="caL"><b>L</b></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Pre-procedure</h2>
+        <div class="grid-2">
+          <div class="field"><label>Vessel access</label>
+            <select id="cVesselAccess">
+              <option value="">Select</option>
+              <option>Femoral</option>
+              <option>Transaxillary</option>
+              <option>Subclavian</option>
+              <option>Transcaval</option>
+              <option>Transcarotid</option>
+            </select>
+          </div>
+          <div class="field"><label>Sheath used</label><input id="cSheath" placeholder="e.g. FlexNav SM 14F / 16F"></div>
+          <div class="field"><label>Access type</label>
+            <select id="cAccessType">
+              <option value="">Select</option>
+              <option>Percutaneous puncture</option>
+              <option>Cutdown</option>
+            </select>
+          </div>
+          <div class="field"><label>Balloon (pre)</label>
+            <select id="cBalloon">
+              <option value="">Select</option>
+              <option>No</option>
+              <option>Yes</option>
+            </select>
+          </div>
+          <div class="field"><label>Diameter size and name</label><input id="cBalloonDiam" placeholder="e.g. 20 mm True Dilatation"></div>
+          <div class="field"><label>Balloon length</label><input id="cBalloonLen" placeholder="e.g. 40 mm"></div>
+          <div class="field"><label>Wire used</label><input id="cWire" placeholder="e.g. Safari / Confida"></div>
+          <div class="field"><label>Pre-procedure gradient</label><input id="cPreGrad" inputmode="decimal" placeholder="mean mmHg"></div>
+          <div class="field"><label>LVEF</label><input id="cLvef" inputmode="decimal" placeholder="%"></div>
+          <div class="field"><label>Previous PPM</label>
+            <select id="cPrevPpm">
+              <option value="">Select</option>
+              <option>No</option>
+              <option>Yes</option>
+            </select>
+          </div>
+          <div class="field"><label>Heart rate</label><input id="cHr" inputmode="numeric" placeholder="bpm"></div>
+          <div class="field span2"><label>Remarks</label><textarea id="cRemarks" placeholder="pre-procedure remarks"></textarea></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Procedure</h2>
+        <div class="grid-2">
+          <div class="field"><label>Valve size</label><input id="cValveSize" placeholder="23 / 25 / 27 / 29 / 35"></div>
+          <div class="field"><label>Sheath</label><input id="cProcSheath" placeholder="e.g. FlexNav SM 14F"></div>
+          <div class="field"><label>BAV</label><input id="cBav" placeholder="yes / no / Sievers"></div>
+          <div class="field"><label>Recaptures</label><input id="cRecaptures" inputmode="numeric" placeholder="0"></div>
+          <div class="field"><label>Implant height</label><input id="cHeight" placeholder="e.g. 3 mm / Vision markers"></div>
+          <div class="field"><label>Implant technique</label><input id="cTechnique" placeholder="e.g. cusp overlap / 3-cusp"></div>
+        </div>
+      </div>
