@@ -1,5 +1,5 @@
-const CACHE = "navitor-sizer-v33";
-const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./case.js", "./peri-pd.js", "./ocr-strict.js", "./mensio-ocr.js", "./result-fix.js", "./fit-color.js", "./inrange-restore.js", "./manifest.json", "./icon.svg", "./navitor-dimensions.jpg",
+const CACHE = "navitor-sizer-v34";
+const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./case.js", "./peri-pd.js", "./ocr-strict.js", "./mensio-ocr.js", "./result-fix.js", "./fit-color.js", "./inrange-restore.js", "./manifest.json", "./icon.svg", "./navitor-dimensions.jpg", "./navitor-table.jpg", "./navitor-valve.jpg",
   "./frag-size-tail.html", "./frag-case-a.html", "./frag-case-b.html", "./frag-result.html", "./frag-charts.html", "./frag-logic.html", "./frag-nav.html"];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
