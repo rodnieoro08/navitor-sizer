@@ -11,24 +11,33 @@ function evaluateSize(s, d) {
   let score = 0;
   let matches = 0;
   let available = 0;
+  const pd = d.peri != null ? d.peri / Math.PI : (d.periPD != null ? Number(d.periPD) : null);
   const periC = centrality(d.peri, s.peri);
-  const areaC = centrality(d.area, s.area);
-  const meanC = centrality(d.meanD, s.meanD);
+  const pdC = pd == null ? 0 : centrality(pd, s.meanD);
+  const periOk = d.peri != null && rangeOk(d.peri, s.peri);
+  const pdOk = pd != null && rangeOk(+pd.toFixed(1), s.meanD);
 
   if (d.peri != null) {
     available++;
-    if (rangeOk(d.peri, s.peri)) { matches++; score += 0.45 * Math.max(0.15, periC); }
-    else { score += 0.15 * periC; flags.push("Perimeter " + d.peri + " mm is outside " + s.size + " mm range " + s.peri[0] + "\u2013" + s.peri[1]); }
+    if (periOk) { matches++; score += 0.7 * Math.max(0.15, periC); }
+    else { score += 0.1 * periC; flags.push("Perimeter " + d.peri + " mm is outside " + s.size + " mm range " + s.peri[0] + "\u2013" + s.peri[1]); }
   }
-  if (d.area != null) {
+  if (pd != null) {
     available++;
-    if (rangeOk(d.area, s.area)) { matches++; score += 0.35 * Math.max(0.15, areaC); }
-    else { score += 0.12 * areaC; flags.push("Area " + d.area + " mm\u00b2 is outside " + s.size + " mm range " + s.area[0] + "\u2013" + s.area[1]); }
+    if (pdOk) { matches++; score += 0.3 * Math.max(0.15, pdC); }
+    else if (periOk) {
+      flags.push("Perimeter-derived diameter " + pd.toFixed(1) + " mm is outside the " + s.size + " mm annulus band " + s.meanD[0] + "\u2013" + s.meanD[1]);
+      score -= 0.08;
+    } else {
+      flags.push("Perimeter-derived diameter " + pd.toFixed(1) + " mm is outside the " + s.size + " mm annulus band " + s.meanD[0] + "\u2013" + s.meanD[1]);
+    }
   }
-  if (d.meanD != null) {
-    available++;
-    if (rangeOk(d.meanD, s.meanD)) { matches++; score += 0.20 * Math.max(0.15, meanC); }
-    else { score += 0.08 * meanC; flags.push("Mean diameter " + d.meanD + " mm is outside labelled use " + s.meanD[0] + "\u2013" + s.meanD[1]); }
+
+  if (periOk && d.area != null && !rangeOk(d.area, s.area)) {
+    flags.push("Area " + d.area + " mm\u00b2 is outside the reference band " + s.area[0] + "\u2013" + s.area[1] + ". It does not change the perimeter decision.");
+  }
+  if (periOk && d.meanD != null && !rangeOk(d.meanD, s.meanD)) {
+    flags.push("Entered mean diameter " + d.meanD + " mm disagrees with the perimeter-derived diameter. Perimeter decides.");
   }
 
   if (d.sovW != null && d.sovW < s.sovW) {
@@ -76,14 +85,15 @@ function evaluateSize(s, d) {
     score -= 0.08;
   }
 
-  const eligible = hard.length === 0 && matches >= 1;
-  return { size: s, score, matches, available, flags, hard, eligible, periC, areaC, meanC };
+  const core = d.peri != null ? periOk : pdOk;
+  const eligible = hard.length === 0 && core;
+  return { size: s, score, matches, available, flags, hard, eligible, periC, areaC: centrality(d.area, s.area), meanC: pdC };
 }
 
 function recommend(d) {
   const checks = consistencyFlags(d);
-  if (d.peri == null && d.area == null && d.meanD == null) {
-    return { error: "Enter at least perimeter, area, or mean annulus diameter." };
+  if (d.peri == null && d.periPD == null && d.meanD == null) {
+    return { error: "Enter perimeter. The decision uses perimeter and perimeter-derived diameter." };
   }
   const evals = SIZES.map((s) => evaluateSize(s, d));
   const eligible = evals.filter((e) => e.eligible).sort((a, b) => b.score - a.score);
@@ -96,8 +106,7 @@ function recommend(d) {
   let coPrimary = null;
   if (eligible[1] && Math.abs(best.score - eligible[1].score) < 0.08) coPrimary = eligible[1];
   let confidence = "high";
-  if (best.matches < 2 || best.flags.length >= 2 || coPrimary || boundary) confidence = "mod";
-  if (best.matches === 1 && best.available >= 2) confidence = "mod";
+  if (best.flags.length >= 2 || coPrimary || boundary) confidence = "mod";
   if (checks.length) confidence = confidence === "high" ? "mod" : confidence;
   return { d, checks, evals, eligible, nearest, primary: best, coPrimary, confidence, boundary };
 }
