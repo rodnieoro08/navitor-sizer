@@ -303,25 +303,25 @@ function renderResult(r) {
 function loadExample(kind) {
   const set = (id, v) => { $(id).value = v ?? ""; };
   if (kind === "clear") {
-    ["peri","area","meanD","minD","maxD","stj","sovMin","sovL","sovR","sovNC","sovH","lca","rca","lvot","aa","access","notes"].forEach((id) => set(id, ""));
+    ["peri","area","meanD","minD","maxD","stj","sovMin","sovL","sovR","sovNC","lca","rca","lvot","aa","access","notes"].forEach((id) => set(id, ""));
     setCalc("calcAnn", "unknown"); setCalc("calcLvot", "unknown"); setCalc("calcStj", "unknown");
     return;
   }
   if (kind === "mid27") {
     set("peri", 75.2); set("area", 448); set("meanD", 24.1); set("minD", 21.8); set("maxD", 26.5);
-    set("stj", 29.4); set("sovL", 32.1); set("sovR", 31.0); set("sovNC", 33.4); set("sovH", 18.2);
+    set("stj", 29.4); set("sovL", 32.1); set("sovR", 31.0); set("sovNC", 33.4);
     set("lca", 13.6); set("rca", 16.1); set("lvot", 23.4); set("aa", 34.0); set("access", 6.2);
     setCalc("calcAnn", "mild"); setCalc("calcLvot", "none"); setCalc("calcStj", "none");
   }
   if (kind === "edge66") {
     set("peri", 66.0); set("area", 340); set("meanD", 21.0); set("minD", 18.6); set("maxD", 23.8);
-    set("stj", 26.2); set("sovL", 27.4); set("sovR", 26.8); set("sovNC", 28.1); set("sovH", 16.0);
+    set("stj", 26.2); set("sovL", 27.4); set("sovR", 26.8); set("sovNC", 28.1);
     set("lca", 11.2); set("rca", 14.0); set("lvot", 20.1); set("aa", 30.0); set("access", 5.4);
     setCalc("calcAnn", "moderate"); setCalc("calcLvot", "mild"); setCalc("calcStj", "moderate");
   }
   if (kind === "edge79") {
     set("peri", 79.0); set("area", 500); set("meanD", 25.2); set("minD", 23.1); set("maxD", 27.4);
-    set("stj", 31.8); set("sovL", 33.0); set("sovR", 31.2); set("sovNC", 34.5); set("sovH", 17.5);
+    set("stj", 31.8); set("sovL", 33.0); set("sovR", 31.2); set("sovNC", 34.5);
     set("lca", 14.8); set("rca", 17.2); set("lvot", 24.8); set("aa", 36.5); set("access", 6.8);
     setCalc("calcAnn", "mild"); setCalc("calcLvot", "none"); setCalc("calcStj", "none");
   }
