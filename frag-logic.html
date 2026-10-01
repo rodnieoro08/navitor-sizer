@@ -3,7 +3,7 @@
         <h2>How a size is chosen</h2>
         <ol>
           <li><b>Need one core number.</b> Perimeter, area or mean diameter. Best practice is all three from the same 3mensio systolic annulus trace.</li>
-          <li><b>Hard IFU filters.</b> A size is excluded if SOV min width is below the floor (25/27/29/31/34), SOV height < 15 mm, ascending aorta is outside that size’s range, or coronary height is below 10 mm.</li>
+          <li><b>Hard IFU filters.</b> A size is excluded if SOV min width is below the floor (25/27/29/31/34), ascending aorta is outside that size’s range, or coronary height is below 10 mm. SOV height is not used.</li>
           <li><b>Range match.</b> Score 0.45 perimeter + 0.35 area + 0.20 mean Ø, using how central the value sits in the published range. Out-of-range values score negatively.</li>
           <li><b>Overlap perimeters.</b> 66 · 72–73 · 79 · 85 mm belong to two sizes. Both stay candidates. The higher score wins only if the gap is ≥ 0.08; otherwise the app returns a co-primary pair for the Heart Team.</li>
           <li><b>Tie-break penalties on the larger size</b> (and flags on both): ellipticity < 0.73; SOV width < 2 mm above floor; STJ < labelled diameter; moderate/severe STJ calcium; severe LVOT calcium; access below FlexNav minimum. Minimum coronary height is 10 mm — below that excludes the size.</li>
