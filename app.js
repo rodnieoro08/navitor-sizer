@@ -393,14 +393,6 @@ function loadExample(kind) {
     set("lca", 14.8); set("rca", 17.2); set("lvot", 24.8); set("aa", 36.5); set("access", 6.8);
     setCalc("calcAnn", "mild"); setCalc("calcLvot", "none"); setCalc("calcStj", "none");
   }
-  if (kind === "ct855") {
-    set("peri", 85.5); set("area", 541.1); set("meanD", 27.4); set("minD", 22.1); set("maxD", 32.7);
-    set("stj", 30.4); set("sovL", 36.7); set("sovR", 33.3); set("sovNC", 35.6); set("sovH", "");
-    set("lca", 21.9); set("rca", 22.8); set("lvot", 26.0); set("aa", 32.4); set("access", "");
-    setCalc("calcAnn", "none"); setCalc("calcLvot", "none"); setCalc("calcStj", "unknown");
-    const notes = document.getElementById("notes");
-    if (notes) notes.value = "CT report. Eccentric annulus (min/max 22.1/32.7, eccentricity 0.32). No significant annular or LVOT calcium. Ca score 3900 AU. Ascending aorta average 32.4 mm.";
-  }
   const peri = document.getElementById("peri");
   if (peri) peri.dispatchEvent(new Event("input", { bubbles: true }));
 }
