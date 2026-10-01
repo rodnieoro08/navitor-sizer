@@ -2,12 +2,7 @@
  "scripts": [
   "app.js",
   "case.js",
-  "ocr-strict.js",
-  "mensio-ocr.js",
-  "inrange-restore.js",
-  "result-fix.js",
-  "fit-color.js",
-  "peri-pd.js"
+  "mensio-ocr.js"
  ],
  "cases": {
   "example mid27 (full data)": {
@@ -12752,12 +12747,12 @@
  "buttons": [
   {
    "example": "mid27",
-   "clearErr": "clear:Cannot set properties of null (setting 'value')",
-   "loadErr": "Cannot set properties of null (setting 'value')",
+   "clearErr": null,
+   "loadErr": null,
    "fieldsAfterLoad": {
     "peri": "75.2",
     "area": "448",
-    "periPD": "",
+    "periPD": "23.9",
     "meanD": "24.1",
     "minD": "21.8",
     "maxD": "26.5",
@@ -12766,15 +12761,15 @@
     "sovL": "32.1",
     "sovR": "31",
     "sovNC": "33.4",
-    "lca": "",
-    "rca": "",
-    "lvot": "",
-    "aa": "",
-    "access": "",
+    "lca": "13.6",
+    "rca": "16.1",
+    "lvot": "23.4",
+    "aa": "34",
+    "access": "6.2",
     "notes": "",
-    "calcAnn": "unknown",
-    "calcLvot": "unknown",
-    "calcStj": "unknown"
+    "calcAnn": "mild",
+    "calcLvot": "none",
+    "calcStj": "none"
    },
    "summary": {
     "primary": 27,
@@ -12849,16 +12844,16 @@
      }
     ]
    },
-   "resultText": "Primary recommendation 27 mm No second size fully compatible High confidence Entered anatomyPerimeter75.2 mmPerimeter-derived diameter23.9 mmArea448 mm²Mean diameter24.1 mmMin / max Ø21.8 / 26.5 mmEllipticity (min/max)0.82 ✓STJ29.4 mmSOV min width31 mm No extra review flagsCore ranges align and soft modifiers are quiet. Fit matrix Y in range · N out · · not entered · score is relative SizePeriAreaMeanØSOVScore — 23NNNY-0.12— 25NNNY-0.06● 27YYYY0.92— 29NNNY-0.30— 35NNNN-0.27 Decision support only for trained Navitor specialists. Not a medical device. IFU, full CT and Heart Team override this output. © chart values from Abbott Navitor Vision didactic TRN1006420 OUS VER A / published use ranges."
+   "resultText": "Primary recommendation 27 mm No second size fully compatible High confidence Entered anatomyPerimeter75.2 mmPerimeter-derived diameter23.9 mmArea448 mm²Mean diameter24.1 mmMin / max Ø21.8 / 26.5 mmEllipticity (min/max)0.82 ✓STJ29.4 mmSOV min width31 mmLCA / RCA height13.6 / 16.1 mmLVOT23.4 mmAscending aorta34 mmAccess min Ø6.2 mm No extra review flagsCore ranges align and soft modifiers are quiet. Fit matrix Y in range · N out · · not entered · score is relative SizePeriAreaMeanØSOVScore — 23NNNY-0.12— 25NNNY-0.06● 27YYYY0.92— 29NNNY-0.30— 35NNNN-0.27 Decision support only for trained Navitor specialists. Not a medical device. IFU, full CT and Heart Team override this output. © chart values from Abbott Navitor Vision didactic TRN1006420 OUS VER A / published use ranges."
   },
   {
    "example": "edge66",
-   "clearErr": "clear:Cannot set properties of null (setting 'value')",
-   "loadErr": "Cannot set properties of null (setting 'value')",
+   "clearErr": null,
+   "loadErr": null,
    "fieldsAfterLoad": {
     "peri": "66",
     "area": "340",
-    "periPD": "",
+    "periPD": "21.0",
     "meanD": "21",
     "minD": "18.6",
     "maxD": "23.8",
@@ -12867,15 +12862,15 @@
     "sovL": "27.4",
     "sovR": "26.8",
     "sovNC": "28.1",
-    "lca": "",
-    "rca": "",
-    "lvot": "",
-    "aa": "",
-    "access": "",
+    "lca": "11.2",
+    "rca": "14",
+    "lvot": "20.1",
+    "aa": "30",
+    "access": "5.4",
     "notes": "",
-    "calcAnn": "unknown",
-    "calcLvot": "unknown",
-    "calcStj": "unknown"
+    "calcAnn": "moderate",
+    "calcLvot": "mild",
+    "calcStj": "moderate"
    },
    "summary": {
     "primary": 23,
@@ -12890,29 +12885,32 @@
      {
       "size": 23,
       "eligible": true,
-      "score": -0.03,
+      "score": -0.13,
       "matches": 2,
       "available": 2,
       "hard": [],
       "flags": [
-       "SOV width only 1.8 mm above the 23 mm floor"
+       "SOV width only 1.8 mm above the 23 mm floor",
+       "STJ calcium moderate"
       ]
      },
      {
       "size": 25,
       "eligible": false,
-      "score": 0.15,
+      "score": 0.05,
       "matches": 2,
       "available": 2,
       "hard": [
        "SOV width 26.8 mm < 27 mm required for 25 mm"
       ],
-      "flags": []
+      "flags": [
+       "STJ calcium moderate"
+      ]
      },
      {
       "size": 27,
       "eligible": false,
-      "score": -0.27,
+      "score": -0.57,
       "matches": 0,
       "available": 2,
       "hard": [
@@ -12921,28 +12919,33 @@
       "flags": [
        "Perimeter 66 mm is outside 27 mm range 72–79",
        "Perimeter-derived diameter 21.0 mm is outside the 27 mm annulus band 23–25",
-       "STJ 26.2 mm is smaller than 27 mm labelled diameter"
+       "Access 5.4 mm < FlexNav minimum 5.5 mm for this size",
+       "STJ 26.2 mm is smaller than 27 mm labelled diameter",
+       "STJ calcium moderate"
       ]
      },
      {
       "size": 29,
       "eligible": false,
-      "score": -0.27,
+      "score": -0.57,
       "matches": 0,
       "available": 2,
       "hard": [
-       "SOV width 26.8 mm < 31 mm required for 29 mm"
+       "SOV width 26.8 mm < 31 mm required for 29 mm",
+       "Ascending aorta 30 mm outside 32–42 mm for 29 mm"
       ],
       "flags": [
        "Perimeter 66 mm is outside 29 mm range 79–85",
        "Perimeter-derived diameter 21.0 mm is outside the 29 mm annulus band 25–27",
-       "STJ 26.2 mm is smaller than 29 mm labelled diameter"
+       "Access 5.4 mm < FlexNav minimum 5.5 mm for this size",
+       "STJ 26.2 mm is smaller than 29 mm labelled diameter",
+       "STJ calcium moderate"
       ]
      },
      {
       "size": 35,
       "eligible": false,
-      "score": -0.27,
+      "score": -0.57,
       "matches": 0,
       "available": 2,
       "hard": [
@@ -12951,21 +12954,23 @@
       "flags": [
        "Perimeter 66 mm is outside 35 mm range 85–95",
        "Perimeter-derived diameter 21.0 mm is outside the 35 mm annulus band 27–30",
-       "STJ 26.2 mm is smaller than 35 mm labelled diameter"
+       "Access 5.4 mm < FlexNav minimum 5.5 mm for this size",
+       "STJ 26.2 mm is smaller than 35 mm labelled diameter",
+       "STJ calcium moderate"
       ]
      }
     ]
    },
-   "resultText": "Primary recommendation 23 mm No second size fully compatible Moderate confidence Entered anatomyPerimeter66 mmPerimeter-derived diameter21.0 mmArea340 mm²Mean diameter21 mmMin / max Ø18.6 / 23.8 mmEllipticity (min/max)0.78 ✓STJ26.2 mmSOV min width26.8 mm FlagsReviewSOV width only 1.8 mm above the 23 mm floor Fit matrix Y in range · N out · · not entered · score is relative SizePeriAreaMeanØSOVScore ● 23YYYY-0.03— 25YYYN0.15— 27NNNN-0.27— 29NNNN-0.27— 35NNNN-0.27 Decision support only for trained Navitor specialists. Not a medical device. IFU, full CT and Heart Team override this output. © chart values from Abbott Navitor Vision didactic TRN1006420 OUS VER A / published use ranges."
+   "resultText": "Primary recommendation 23 mm No second size fully compatible Moderate confidence Entered anatomyPerimeter66 mmPerimeter-derived diameter21.0 mmArea340 mm²Mean diameter21 mmMin / max Ø18.6 / 23.8 mmEllipticity (min/max)0.78 ✓STJ26.2 mmSOV min width26.8 mmLCA / RCA height11.2 / 14 mmLVOT20.1 mmAscending aorta30 mmAccess min Ø5.4 mm FlagsReviewSOV width only 1.8 mm above the 23 mm floorReviewSTJ calcium moderate Fit matrix Y in range · N out · · not entered · score is relative SizePeriAreaMeanØSOVScore ● 23YYYY-0.13— 25YYYN0.05— 27NNNN-0.57— 29NNNN-0.57— 35NNNN-0.57 Decision support only for trained Navitor specialists. Not a medical device. IFU, full CT and Heart Team override this output. © chart values from Abbott Navitor Vision didactic TRN1006420 OUS VER A / published use ranges."
   },
   {
    "example": "edge79",
-   "clearErr": "clear:Cannot set properties of null (setting 'value')",
-   "loadErr": "Cannot set properties of null (setting 'value')",
+   "clearErr": null,
+   "loadErr": null,
    "fieldsAfterLoad": {
     "peri": "79",
     "area": "500",
-    "periPD": "",
+    "periPD": "25.1",
     "meanD": "25.2",
     "minD": "23.1",
     "maxD": "27.4",
@@ -12974,15 +12979,15 @@
     "sovL": "33",
     "sovR": "31.2",
     "sovNC": "34.5",
-    "lca": "",
-    "rca": "",
-    "lvot": "",
-    "aa": "",
-    "access": "",
+    "lca": "14.8",
+    "rca": "17.2",
+    "lvot": "24.8",
+    "aa": "36.5",
+    "access": "6.8",
     "notes": "",
-    "calcAnn": "unknown",
-    "calcLvot": "unknown",
-    "calcStj": "unknown"
+    "calcAnn": "mild",
+    "calcLvot": "none",
+    "calcStj": "none"
    },
    "summary": {
     "primary": 27,
@@ -13001,7 +13006,9 @@
       "score": -0.12,
       "matches": 0,
       "available": 2,
-      "hard": [],
+      "hard": [
+       "Ascending aorta 36.5 mm outside 26–36 mm for 23 mm"
+      ],
       "flags": [
        "Perimeter 79 mm is outside 23 mm range 60–66",
        "Perimeter-derived diameter 25.1 mm is outside the 23 mm annulus band 19–21"
@@ -13060,14 +13067,10 @@
      }
     ]
    },
-   "resultText": "Primary recommendation 27 mm Also compatible: 29 mm Moderate confidence Entered anatomyPerimeter79 mmPerimeter-derived diameter25.1 mmArea500 mm²Mean diameter25.2 mmMin / max Ø23.1 / 27.4 mmEllipticity (min/max)0.84 ✓STJ31.8 mmSOV min width31.2 mm FlagsReviewPerimeter-derived diameter 25.1 mm is outside the 27 mm annulus band 23–25ReviewArea 500 mm² is outside the reference band 405–491. It does not change the perimeter decision.ReviewEntered mean diameter 25.2 mm disagrees with the perimeter-derived diameter. Perimeter decides. Side-by-side Candidate27Peri 72–79 · SOV ≥29 · Access ≥5.5 Candidate29Peri 79–85 · SOV ≥31 · Access ≥5.5 Fit matrix Y in range · N out · · not entered · score is relative SizePeriAreaMeanØSOVScore — 23NNNY-0.12— 25NNNY-0.12● 27YNNY0.10○ 29YYYY-0.03— 35NNNN-0.27 Decision support only for trained Navitor specialists. Not a medical device. IFU, full CT and Heart Team override this output. © chart values from Abbott Navitor Vision didactic TRN1006420 OUS VER A / published use ranges."
+   "resultText": "Primary recommendation 27 mm Also compatible: 29 mm Moderate confidence Entered anatomyPerimeter79 mmPerimeter-derived diameter25.1 mmArea500 mm²Mean diameter25.2 mmMin / max Ø23.1 / 27.4 mmEllipticity (min/max)0.84 ✓STJ31.8 mmSOV min width31.2 mmLCA / RCA height14.8 / 17.2 mmLVOT24.8 mmAscending aorta36.5 mmAccess min Ø6.8 mm FlagsReviewPerimeter-derived diameter 25.1 mm is outside the 27 mm annulus band 23–25ReviewArea 500 mm² is outside the reference band 405–491. It does not change the perimeter decision.ReviewEntered mean diameter 25.2 mm disagrees with the perimeter-derived diameter. Perimeter decides. Side-by-side Candidate27Peri 72–79 · SOV ≥29 · Access ≥5.5 Candidate29Peri 79–85 · SOV ≥31 · Access ≥5.5 Fit matrix Y in range · N out · · not entered · score is relative SizePeriAreaMeanØSOVScore — 23NNNY-0.12— 25NNNY-0.12● 27YNNY0.10○ 29YYYY-0.03— 35NNNN-0.27 Decision support only for trained Navitor specialists. Not a medical device. IFU, full CT and Heart Team override this output. © chart values from Abbott Navitor Vision didactic TRN1006420 OUS VER A / published use ranges."
   },
   {
-   "clearLeaves": [
-    "lca",
-    "access",
-    "notes"
-   ]
+   "clearLeaves": []
   }
  ],
  "bootErrors": [],
