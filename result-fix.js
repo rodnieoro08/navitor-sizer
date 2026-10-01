@@ -1,3 +1,9 @@
+const num = (id) => {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  const v = parseFloat(el.value);
+  return Number.isFinite(v) ? v : null;
+};
 function rangeOk(v, r) {
   return v != null && Array.isArray(r) && v >= r[0] && v <= r[1];
 }
