@@ -1,27 +1,27 @@
 const SIZES = [
   {
     size: 23, meanD: [19, 21], area: [277, 346], peri: [60, 66],
-    aa: [26, 36], sovW: 25, sovH: 15, access: 5.0,
+    aa: [26, 36], sovW: 25, access: 5.0,
     inflow: 23, outflow: 23, stentD: 41, commH: 21, halfCell: 7, cuff: 9, stentH: 47
   },
   {
     size: 25, meanD: [21, 23], area: [338, 415], peri: [66, 73],
-    aa: [28, 38], sovW: 27, sovH: 15, access: 5.0,
+    aa: [28, 38], sovW: 27, access: 5.0,
     inflow: 25, outflow: 25, stentD: 43, commH: 23, halfCell: 7, cuff: 9, stentH: 48
   },
   {
     size: 27, meanD: [23, 25], area: [405, 491], peri: [72, 79],
-    aa: [30, 40], sovW: 29, sovH: 15, access: 5.5,
+    aa: [30, 40], sovW: 29, access: 5.5,
     inflow: 27, outflow: 27, stentD: 44, commH: 24, halfCell: 8, cuff: 10, stentH: 48
   },
   {
     size: 29, meanD: [25, 27], area: [479, 573], peri: [79, 85],
-    aa: [32, 42], sovW: 31, sovH: 15, access: 5.5,
+    aa: [32, 42], sovW: 31, access: 5.5,
     inflow: 29, outflow: 29, stentD: 46, commH: 25, halfCell: 8, cuff: 10, stentH: 48
   },
   {
     size: 35, meanD: [27, 30], area: [559, 707], peri: [85, 95],
-    aa: [27, 44], sovW: 34, sovH: 15, access: 5.5,
+    aa: [27, 44], sovW: 34, access: 5.5,
     inflow: 35, outflow: 35, stentD: 48, commH: 27, halfCell: 9, cuff: 11, stentH: 47
   }
 ];
@@ -58,7 +58,6 @@ function gather() {
     stj: num("stj"),
     sovW: sovs.length ? Math.min(...sovs) : num("sovMin"),
     sovL, sovR, sovNC,
-    sovH: num("sovH"),
     lca: num("lca"),
     rca: num("rca"),
     lvot: num("lvot"),
@@ -106,9 +105,6 @@ function evaluateSize(s, d) {
   // Hard IFU-style constraints
   if (d.sovW != null && d.sovW < s.sovW) {
     hard.push(`SOV width ${d.sovW} mm < ${s.sovW} mm required for ${s.size} mm`);
-  }
-  if (d.sovH != null && d.sovH < s.sovH) {
-    hard.push(`SOV height ${d.sovH} mm < ${s.sovH} mm required`);
   }
   if (d.aa != null && !inRange(d.aa, s.aa)) {
     hard.push(`Ascending aorta ${d.aa} mm outside ${s.aa[0]}–${s.aa[1]} mm for ${s.size} mm`);
@@ -311,7 +307,6 @@ function renderResult(r) {
   if (ell != null) why.push(["Ellipticity (min/max)", ell.toFixed(2) + (ell < 0.73 ? " ⚠" : " ✓")]);
   if (d.stj != null) why.push(["STJ", `${d.stj} mm`]);
   if (d.sovW != null) why.push(["SOV min width", `${d.sovW} mm`]);
-  if (d.sovH != null) why.push(["SOV height", `${d.sovH} mm`]);
   if (d.lca != null || d.rca != null) why.push(["LCA / RCA height", `${fmt(d.lca)} / ${fmt(d.rca)} mm`]);
   if (d.lvot != null) why.push(["LVOT", `${d.lvot} mm`]);
   if (d.aa != null) why.push(["Ascending aorta", `${d.aa} mm`]);
@@ -474,7 +469,6 @@ function renderCharts() {
       <td class="num">${s.peri[0]}–${s.peri[1]}</td>
       <td class="num">${s.aa[0]}–${s.aa[1]}</td>
       <td class="num">≥${s.sovW}</td>
-      <td class="num">≥${s.sovH}</td>
       <td class="num">≥${s.access.toFixed(1)}</td>
     </tr>`).join("");
   $("chart-ifus").innerHTML = body;
