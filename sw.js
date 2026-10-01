@@ -1,4 +1,4 @@
-const CACHE = "navitor-sizer-v21";
+const CACHE = "navitor-sizer-v22";
 const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./case.js", "./peri-pd.js", "./ocr-strict.js", "./mensio-ocr.js", "./result-fix.js", "./inrange-restore.js", "./manifest.json", "./icon.svg",
   "./frag-size-tail.html", "./frag-case-a.html", "./frag-case-b.html", "./frag-result.html", "./frag-charts.html", "./frag-logic.html", "./frag-nav.html"];
 self.addEventListener("install", (e) => {
