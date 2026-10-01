@@ -9,6 +9,7 @@ function inRange(v, r) {
    Hard: annulus diameter AND ascending aorta diameter.
    Area and perimeter are reference only.
    Footnote: minor/major axis ratio >= 0.73.
+   Added rule: minimum coronary height 10 mm (LCA or RCA).
 */
 function evaluateSize(s, d) {
   const flags = [];
@@ -38,6 +39,13 @@ function evaluateSize(s, d) {
   }
   if (annulusOk && d.minD != null && d.maxD != null && d.maxD > 0 && (d.minD / d.maxD) < 0.73) {
     flags.push("Annulus min/max ratio " + (d.minD / d.maxD).toFixed(2) + " is below 0.73 (IFU footnote for annulus diameter).");
+  }
+  const cors = [d.lca, d.rca].filter((x) => x != null);
+  if (cors.length) {
+    const mc = Math.min.apply(null, cors);
+    if (mc < 10) {
+      hard.push("Coronary height " + mc + " mm is below the 10 mm minimum");
+    }
   }
   if (annulusOk && d.access != null && d.access < s.access) {
     flags.push("Access " + d.access + " mm is below the FlexNav minimum " + s.access.toFixed(1) + " mm for " + s.size + " mm.");
