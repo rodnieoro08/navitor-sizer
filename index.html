@@ -25,7 +25,6 @@
       <span class="pill warn">Heart Team decides</span>
     </div>
   </header>
-
   <main class="wrap">
     <section id="screen-input" class="screen active">
       <div class="card">
@@ -36,43 +35,6 @@
           <button type="button" data-ex="edge79">Boundary 79 mm</button>
         </div>
       </div>
-      <div class="card">
-        <h2>Annulus</h2>
-        <p class="hint">Primary drivers. Perimeter is used first when sizes overlap.</p>
-        <div class="grid-2">
-          <div class="field"><label>Perimeter <span class="unit">mm</span></label><input id="peri" inputmode="decimal" placeholder="e.g. 74.2"></div>
-          <div class="field"><label>Area <span class="unit">mm²</span></label><input id="area" inputmode="decimal" placeholder="e.g. 448"></div>
-          <div class="field"><label>Perimeter-derived diameter <span class="unit">mm</span></label>
-            <input id="periPD" inputmode="decimal" readonly placeholder="peri ÷ π">
-          </div>
-          <div class="field"><label>Min / max Ø</label>
-            <div class="grid-2" style="gap:6px">
-              <input id="minD" inputmode="decimal" placeholder="min">
-              <input id="maxD" inputmode="decimal" placeholder="max">
-            </div>
-          </div>
-          <div class="field"><label>Mean diameter <span class="unit">mm</span></label><input id="meanD" inputmode="decimal" placeholder="e.g. 24.1"></div>
-        </div>
-      </div>
-      <div class="card">
-        <h2>Root · used on overlaps</h2>
-        <div class="grid-2">
-          <div class="field"><label>STJ diameter <span class="unit">mm</span></label><input id="stj" inputmode="decimal"></div>
-          <div class="field"><label>SOV height <span class="unit">mm</span></label><input id="sovH" inputmode="decimal" placeholder="≥15 all sizes"></div>
-          <div class="field"><label>SOV L / R / NC <span class="unit">mm</span></label>
-            <div class="grid-3">
-              <input id="sovL" inputmode="decimal" placeholder="L">
-              <input id="sovR" inputmode="decimal" placeholder="R">
-              <input id="sovNC" inputmode="decimal" placeholder="NC">
-            </div>
-          </div>
-          <div class="field"><label>Or SOV min width only</label><input id="sovMin" inputmode="decimal" placeholder="if not split"></div>
-          <div class="field"><label>LCA height <span class="unit">mm</span></label><input id="lca" inputmode="decimal"></div>
-          <div class="field"><label>RCA height <span class="unit">mm</span></label><input id="rca" inputmode="decimal"></div>
-          <div class="field"><label>LVOT Ø <span class="unit">mm</span></label><input id="lvot" inputmode="decimal"></div>
-          <div class="field"><label>Ascending aorta <span class="unit">mm</span></label><input id="aa" inputmode="decimal"></div>
-        </div>
-      </div>
       <div id="mount-size"></div>
     </section>
     <section id="screen-case" class="screen"><div id="mount-case"></div></section>
@@ -81,7 +43,6 @@
     <section id="screen-logic" class="screen"><div id="mount-logic"></div></section>
   </main>
   <div id="mount-nav"></div>
-
   <script>
   (async function () {
     async function put(id, file) {
@@ -90,28 +51,23 @@
       el.insertAdjacentHTML("beforeend", t);
     }
     try {
-      await put("mount-size", "./frag-size-tail.html");
-      await put("mount-case", "./frag-case-a.html");
-      await put("mount-case", "./frag-case-b.html");
-      await put("mount-charts", "./frag-charts.html");
-      await put("mount-logic", "./frag-logic.html");
-      await put("mount-nav", "./frag-nav.html");
-    } catch (err) {
-      console.error(err);
-    }
+      await put("mount-size", "./frag-size-tail.html?v=21");
+      await put("mount-case", "./frag-case-a.html?v=21");
+      await put("mount-case", "./frag-case-b.html?v=21");
+      await put("mount-charts", "./frag-charts.html?v=21");
+      await put("mount-logic", "./frag-logic.html?v=21");
+      await put("mount-nav", "./frag-nav.html?v=21");
+    } catch (err) { console.error(err); }
     function add(src) {
       return new Promise((res, rej) => {
         const s = document.createElement("script");
-        s.src = src + (src.indexOf("http") === 0 ? "" : "?v=20");
-        s.onload = res;
-        s.onerror = rej;
+        s.src = src.indexOf("http") === 0 ? src : src + "?v=21";
+        s.onload = res; s.onerror = rej;
         document.body.appendChild(s);
       });
     }
     await add("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
-    if (window.pdfjsLib) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    }
+    if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     await add("./app.js");
     await add("./case.js");
     await add("./ocr-strict.js");
