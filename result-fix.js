@@ -34,9 +34,6 @@ function evaluateSize(s, d) {
   if (d.sovW != null && d.sovW < s.sovW) {
     hard.push("SOV width " + d.sovW + " mm < " + s.sovW + " mm required for " + s.size + " mm");
   }
-  if (d.sovH != null && d.sovH < s.sovH) {
-    hard.push("SOV height " + d.sovH + " mm < " + s.sovH + " mm required");
-  }
   if (d.aa != null && !rangeOk(d.aa, s.aa)) {
     hard.push("Ascending aorta " + d.aa + " mm outside " + s.aa[0] + "\u2013" + s.aa[1] + " mm for " + s.size + " mm");
   }
