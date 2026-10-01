@@ -38,7 +38,7 @@
       </div>
       <div class="card">
         <h2>Annulus</h2>
-        <p class="hint">IFU sizes on annulus diameter and ascending aorta. Perimeter and area are reference.</p>
+        <p class="hint">Decision is perimeter and perimeter-derived diameter. Area and mean diameter are checks only.</p>
         <div class="grid-2">
           <div class="field"><label>Perimeter <span class="unit">mm</span></label><input id="peri" inputmode="decimal" placeholder="e.g. 74.2"></div>
           <div class="field"><label>Area <span class="unit">mm²</span></label><input id="area" inputmode="decimal" placeholder="e.g. 448"></div>
@@ -89,19 +89,19 @@
       el.insertAdjacentHTML("beforeend", t);
     }
     try {
-      await put("mount-size", "./frag-size-tail.html?v=24");
-      await put("mount-case", "./frag-case-a.html?v=24");
-      await put("mount-case", "./frag-case-b.html?v=24");
-      await put("mount-charts", "./frag-charts.html?v=24");
-      await put("mount-logic", "./frag-logic.html?v=24");
-      await put("mount-nav", "./frag-nav.html?v=24");
+      await put("mount-size", "./frag-size-tail.html?v=25");
+      await put("mount-case", "./frag-case-a.html?v=25");
+      await put("mount-case", "./frag-case-b.html?v=25");
+      await put("mount-charts", "./frag-charts.html?v=25");
+      await put("mount-logic", "./frag-logic.html?v=25");
+      await put("mount-nav", "./frag-nav.html?v=25");
     } catch (err) {
       console.error(err);
     }
     function add(src) {
       return new Promise((res, rej) => {
         const s = document.createElement("script");
-        s.src = src + (src.indexOf("http") === 0 ? "" : "?v=24");
+        s.src = src + (src.indexOf("http") === 0 ? "" : "?v=25");
         s.onload = res;
         s.onerror = rej;
         document.body.appendChild(s);
