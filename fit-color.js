@@ -31,8 +31,26 @@ function colorFitMatrix(r) {
     else tr.classList.add("fit-red");
   });
 }
+function showDerivedDiameter(r) {
+  if (!r || !r.d || r.d.peri == null) return;
+  var rows = document.querySelectorAll("#result-body .why-row");
+  var periRow = null;
+  for (var i = 0; i < rows.length; i++) {
+    var label = rows[i].querySelector("span");
+    if (label && label.textContent.trim() === "Perimeter") periRow = rows[i];
+  }
+  if (!periRow) return;
+  var pd = (r.d.peri / Math.PI).toFixed(1);
+  var row = document.createElement("div");
+  row.className = "why-row";
+  row.innerHTML = "<span>Perimeter-derived diameter</span><span>" + pd + " mm</span>";
+  periRow.after(row);
+}
 var previousGo = navitorGo;
 navitorGo = function () {
   previousGo();
-  if (window.__lastRec) colorFitMatrix(window.__lastRec);
+  if (window.__lastRec) {
+    showDerivedDiameter(window.__lastRec);
+    colorFitMatrix(window.__lastRec);
+  }
 };
