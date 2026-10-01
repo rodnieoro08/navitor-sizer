@@ -1,10 +1,10 @@
-function inRange(v, min, max) {
+function mensioInRange(v, min, max) {
   return Number.isFinite(v) && v >= min && v <= max;
 }
 function fixDec(v, min, max) {
   if (!Number.isFinite(v)) return null;
-  if (inRange(v, min, max)) return v;
-  if (inRange(v / 10, min, max)) return +(v / 10).toFixed(1);
+  if (mensioInRange(v, min, max)) return v;
+  if (mensioInRange(v / 10, min, max)) return +(v / 10).toFixed(1);
   return null;
 }
 function firstNum(re, text) {
@@ -141,9 +141,7 @@ function applyMensio(p) {
     $(id).value = p[k];
     n++;
   });
-  if (typeof updatePeriPD === "function" && p.periPD == null) updatePeriPD();
   if ($("periPD") && p.periPD != null) $("periPD").value = Number(p.periPD).toFixed(1);
-  if (typeof updateMeanFromMinMax === "function" && !p.meanD) updateMeanFromMinMax();
   return n;
 }
 

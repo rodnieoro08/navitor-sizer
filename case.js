@@ -9,6 +9,7 @@ function rememberStickerFile(file) {
 const GTIN_REF = {
   "05415067045805": { kind: "valve", ref: "NVRO-23" },
   "05415067058003": { kind: "delivery", ref: "FNAV-DS-SM" },
+  "05415067031372": { kind: "delivery", ref: "FNAV-DS-SM" },
   "05415067036667": { kind: "loading", ref: "NVTR-LS-SM" }
 };
 
@@ -422,106 +423,124 @@ function fileToCanvas(file) {
   });
 }
 
-function findUdis(text) {
-  const compact = text.replace(/\s+/g, "");
-  const out = [];
-  const re = /\(01\)\d{14}(?:\(\d{2}\)[A-Za-z0-9.\-]{1,20})+/g;
-  let m;
-  while ((m = re.exec(compact))) out.push(m[0]);
-  // also raw AI string without all parens if OCR dropped some
-  const re2 = /01(\d{14})17(\d{6})(?:10([A-Z0-9]{4,})|21([A-Z0-9]{4,}))/g;
-  while ((m = re2.exec(compact))) {
-    const udi = `(01)${m[1]}(17)${m[2]}${m[3] ? "(10)" + m[3] : "(21)" + m[4]}`;
-    if (!out.includes(udi)) out.push(udi);
-  }
-  return out;
+/* Group-sticker reader: one photo to valve / delivery / loading fields only.
+   (formerly ocr-strict.js; replaces the earlier looser reader) */
+function yymmddToIso(s) {
+  if (!s || !/^\d{6}$/.test(s)) return "";
+  return "20" + s.slice(0, 2) + "-" + s.slice(2, 4) + "-" + s.slice(4, 6);
 }
 
-function findRefs(text) {
-  const t = text.toUpperCase().replace(/O(?=\d)/g, "0");
-  const refs = [];
-  const patterns = [
-    /FNAV[\s\-]*DS[\s\-]*(SM|LG)/g,
-    /NVTR[\s\-]*LS[\s\-]*(SM|LG)/g,
-    /NVRO[\s\-]*(23|25|27|29|35)/g,
-    /NVTR[\s\-]*(23|25|27|29|35)/g
-  ];
-  patterns.forEach((re, i) => {
-    let m;
-    while ((m = re.exec(t))) {
-      if (i === 0) refs.push({ kind: "delivery", ref: "FNAV-DS-" + m[1] });
-      else if (i === 1) refs.push({ kind: "loading", ref: "NVTR-LS-" + m[1] });
-      else if (i === 2) refs.push({ kind: "valve", ref: "NVRO-" + m[1] });
-      else refs.push({ kind: "valve", ref: "NVTR-" + m[1] });
-    }
-  });
-  return refs;
+function normalizeStickerText(text) {
+  return String(text || "")
+    .toUpperCase()
+    .replace(/[\u2013\u2014]/g, "-")
+    .replace(/O(?=\d)/g, "0")
+    .replace(/REF\s*/g, " REF ")
+    .replace(/LOT\s*/g, " LOT ")
+    .replace(/\bS\/N\b/g, " SN ")
+    .replace(/SERIAL\s*/g, " SN ");
 }
 
 function extractDevicesFromText(text) {
   const devices = { valve: {}, delivery: {}, loading: {} };
-  findUdis(text).forEach((udi) => {
-    const p = parseUDI(udi);
-    p.udi = udi;
-    if (!p.kind) {
-      if (p.sn) p.kind = "valve";
-      else if (p.lot) p.kind = p.kind || "delivery";
+  const raw = String(text || "");
+  const t = normalizeStickerText(raw);
+  const compact = raw.replace(/\s+/g, "");
+
+  const refs = [
+    { kind: "loading", re: /NVTR[\s\-]*LS[\s\-]*(SM|LG)/, make: (m) => "NVTR-LS-" + m[1] },
+    { kind: "delivery", re: /FNAV[\s\-]*DS[\s\-]*(SM|LG)/, make: (m) => "FNAV-DS-" + m[1] },
+    { kind: "valve", re: /NVRO[\s\-]*(23|25|27|29|35)/, make: (m) => "NVRO-" + m[1] },
+    { kind: "valve", re: /NVTR[\s\-]*(23|25|27|29|35)/, make: (m) => "NVTR-" + m[1] }
+  ];
+  refs.forEach((r) => {
+    const m = t.match(r.re);
+    if (m) devices[r.kind].ref = devices[r.kind].ref || r.make(m);
+  });
+
+  const udiPatterns = [
+    /\(01\)(\d{14})\(17\)(\d{6})\(21\)(\d{6,})/g,
+    /\(01\)(\d{14})\(17\)(\d{6})\(10\)([A-Z0-9\-]+)/g,
+    /01(\d{14})17(\d{6})21(\d{6,})/g,
+    /01(\d{14})17(\d{6})10([A-Z0-9\-]+)/g
+  ];
+  udiPatterns.forEach((re, idx) => {
+    let m;
+    const src = idx < 2 ? compact : compact.replace(/[()]/g, "");
+    while ((m = re.exec(src))) {
+      const gtin = m[1];
+      const exp = yymmddToIso(m[2]);
+      const known = typeof GTIN_REF === "object" ? GTIN_REF[gtin] : null;
+      let kind = known && known.kind;
+      const payload = m[3] || "";
+      if (!kind) kind = (idx % 2 === 0) ? "valve" : (devices.delivery.lot ? "loading" : "delivery");
+      if (known && known.ref) devices[kind].ref = devices[kind].ref || known.ref;
+      if (exp) devices[kind].exp = devices[kind].exp || exp;
+      if (idx % 2 === 0) {
+        if (kind === "valve") devices.valve.sn = devices.valve.sn || payload;
+      } else if (kind !== "valve") {
+        devices[kind].lot = devices[kind].lot || payload;
+      }
     }
-    if (p.kind && devices[p.kind]) Object.assign(devices[p.kind], p);
   });
-  findRefs(text).forEach((r) => {
-    if (!devices[r.kind].ref) devices[r.kind].ref = r.ref;
-    else if (!devices[r.kind].ref) devices[r.kind].ref = r.ref;
-    devices[r.kind].ref = devices[r.kind].ref || r.ref;
-  });
-  const dates = text.match(/20[2-3]\d[-/.](?:0\d|1[0-2])[-/.](?:0[1-9]|[12]\d|3[01])/g) || [];
-  // assign leftover dates only if a device is missing expiry
-  dates.map((d) => d.replace(/[/.]/g, "-")).forEach((d) => {
-    ["valve", "delivery", "loading"].forEach((k) => {
-      if (devices[k].ref && !devices[k].exp) devices[k].exp = d;
-    });
-  });
-  const lots = text.match(/LOT\s*([A-Z0-9]{5,})/ig) || [];
-  if (lots[0] && !devices.delivery.lot) devices.delivery.lot = lots[0].replace(/LOT\s*/i, "");
-  if (lots[1] && !devices.loading.lot) devices.loading.lot = lots[1].replace(/LOT\s*/i, "");
+
+  function pickDate(chunk) {
+    const iso = chunk.match(/20[2-3]\d[-/.](?:0\d|1[0-2])[-/.](?:0[1-9]|[12]\d|3[01])/);
+    return iso ? iso[0].replace(/[/.]/g, "-") : "";
+  }
+  function pickLot(chunk) {
+    const m = chunk.match(/LOT\s*[:#]?\s*([A-Z0-9]{6,})/);
+    return m ? m[1] : "";
+  }
+  function pickSn(chunk) {
+    const m = chunk.match(/SN\s*[:#]?\s*([A-Z0-9]{6,})/);
+    return m ? m[1] : "";
+  }
+  function windowAround(token) {
+    const i = t.indexOf(token);
+    if (i < 0) return "";
+    return t.slice(Math.max(0, i - 60), i + token.length + 90);
+  }
+
+  if (devices.loading.ref) {
+    const w = windowAround("NVTR-LS") || windowAround("LOADING");
+    devices.loading.lot = devices.loading.lot || pickLot(w) || pickLot(t);
+    devices.loading.exp = devices.loading.exp || pickDate(w);
+  }
+  if (devices.delivery.ref) {
+    const w = windowAround("FNAV-DS") || windowAround("DELIVERY");
+    devices.delivery.lot = devices.delivery.lot || pickLot(w);
+    devices.delivery.exp = devices.delivery.exp || pickDate(w);
+  }
+  if (devices.valve.ref) {
+    const w = windowAround(devices.valve.ref) || windowAround("NVRO") || windowAround("VALVE");
+    devices.valve.sn = devices.valve.sn || pickSn(w) || pickSn(t);
+    devices.valve.exp = devices.valve.exp || pickDate(w);
+  }
   return devices;
 }
 
 function applyDevices(devices) {
-  const map = {
-    valve: { ref: "vRef", sn: "vSn", exp: "vExp", udi: "vUdi", lot: null },
-    delivery: { ref: "dRef", sn: null, exp: "dExp", udi: "dUdi", lot: "dLot" },
-    loading: { ref: "lRef", sn: null, exp: "lExp", udi: "lUdi", lot: "lLot" }
+  const allowed = {
+    valve: { ref: "vRef", sn: "vSn", exp: "vExp" },
+    delivery: { ref: "dRef", lot: "dLot", exp: "dExp" },
+    loading: { ref: "lRef", lot: "lLot", exp: "lExp" }
   };
   let filled = 0;
-  Object.entries(map).forEach(([kind, ids]) => {
+  Object.entries(allowed).forEach(([kind, ids]) => {
     const d = devices[kind] || {};
     Object.entries(ids).forEach(([k, id]) => {
-      if (id && d[k] && !$(id).value) {
-        if ($(id).tagName === "SELECT") {
-          const opt = [...$(id).options].find((o) => o.value === d[k]);
-          if (opt) $(id).value = d[k];
-          else {
-            const extra = document.createElement("option");
-            extra.value = d[k];
-            extra.textContent = d[k];
-            $(id).appendChild(extra);
-            $(id).value = d[k];
-          }
-        } else $(id).value = d[k];
-        filled++;
+      if (!id || !d[k] || !$(id)) return;
+      if ($(id).tagName === "SELECT") {
+        const opt = [...$(id).options].find((o) => o.value === d[k]);
+        if (!opt) return;
+        $(id).value = d[k];
+      } else {
+        $(id).value = d[k];
       }
+      filled++;
     });
   });
-  if (devices.valve.ref && !$("cValveSize").value) {
-    const m = devices.valve.ref.match(/(\d{2})$/);
-    if (m) $("cValveSize").value = m[1];
-  }
-  if (devices.delivery.ref && !$("cSheath").value) {
-    const sh = devices.delivery.ref === "FNAV-DS-LG" ? "FlexNav LG 15F" : "FlexNav SM 14F";
-    $("cSheath").value = sh;
-    if ($("cProcSheath") && !$("cProcSheath").value) $("cProcSheath").value = sh;
-  }
   return filled;
 }
 

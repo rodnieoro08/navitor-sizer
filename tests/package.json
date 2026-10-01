@@ -1,0 +1,14 @@
+{
+  "name": "navitor-sizer-tests",
+  "private": true,
+  "description": "Dev-only regression + smoke tests. Not deployed; GitHub Pages only needs the repo-root app files.",
+  "scripts": {
+    "test": "node harness.js",
+    "baseline": "node harness.js --write",
+    "smoke": "node smoke.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.0",
+    "puppeteer-core": "^23.0.0"
+  }
+}

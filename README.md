@@ -1,40 +1,51 @@
 # Navitor Vision Sizer
 
-Personal decision-support + proctor case card for Navitor Vision.
+Personal decision-support sizing tool and proctor case card for Navitor Vision.
+Plain JavaScript, no build step, installable as an iPhone PWA.
 
-Not official Abbott software. Not CE / UKCA marked. Heart Team decides.
-Do not upload patient photos or identifiable reports into this GitHub repo.
+**Live:** https://rodnieoro08.github.io/navitor-sizer/
 
-## Files to put in the GitHub repo root
+> Not official Abbott software. Not CE / UKCA marked. The Heart Team decides.
+> Never commit patient photos or identifiable reports to this repo.
 
-These must sit next to each other in the repo root, not inside another folder:
+## What it does
 
-- index.html
-- app.js
-- case.js
-- styles.css
-- manifest.json
-- sw.js
-- icon.svg
+- Recommends a Navitor Vision size from 3mensio numbers. Perimeter and perimeter-derived diameter (peri ÷ π) decide; area and entered mean diameter are checks only. See [DECISION_TREE.md](DECISION_TREE.md).
+- Proctor case form, with sticker photos read on-device (OCR) into REF / SN / LOT / expiry.
+- Exports the case card to Apple Notes through the iOS share sheet (or copies the text).
 
-Optional: README.md, DECISION_TREE.md
+## File layout
 
-## Replace everything on GitHub
+Everything the site needs sits in the repo root (GitHub Pages serves it straight from `main`, `/ (root)`). Do not nest these in a folder.
 
-1. Unzip this archive on your computer.
-2. Open the repository on github.com.
-3. If files currently live in a nested folder, delete that extra folder first.
-4. Add file → Upload files, then drop the files listed above.
-5. Commit.
-6. Settings → Pages → Deploy from branch main, folder / (root).
-7. On iPhone open the site in Safari, pull to refresh, then Add to Home Screen again if needed.
+| File | Purpose |
+|---|---|
+| `index.html` | Shell, Size-tab form, loads the fragments and scripts (in this order: pdf.js CDN, `app.js`, `case.js`, `mensio-ocr.js`) |
+| `app.js` | Size ranges, scoring, Result tab, examples, charts, `init()` |
+| `case.js` | Case form, Notes export, sticker OCR |
+| `mensio-ocr.js` | 3mensio text / PDF / photo parsing into the Size tab |
+| `frag-*.html` | Tab fragments fetched into `index.html` at start-up |
+| `styles.css`, `manifest.json`, `icon.svg` | Styling and PWA metadata |
+| `sw.js` | Service worker (network first, cache fallback) |
+| `navitor-*.jpg` | Public Navitor dimension / diagram images shown on the Charts tab |
+| `tests/` | Dev-only regression and smoke tests (not needed by the site) |
 
-URL pattern: https://YOURUSERNAME.github.io/REPO-NAME/
+## Releasing a change (bump the cache version)
 
-## This build includes
+1. Edit the files and merge to `main`. Pages redeploys in a minute or so.
+2. Bump the version so phones pick it up. Both places must change together:
+   - `index.html`: replace every `?v=NN` with the new number (fragments and scripts).
+   - `sw.js`: change `const CACHE = "navitor-sizer-vNN"`.
+3. If you add or remove a root file, update `ASSETS` in `sw.js` too.
+4. On iPhone, open the app, close it fully and reopen (or pull to refresh in Safari). Re-add to Home Screen only if it still looks stale.
 
-- Size recommendation from 3mensio numbers
-- Proctor case form
-- Sticker photos from Camera or iPhone library
-- On-device reading of sticker text / UDI
-- Share case text plus sticker photos to Apple Notes
+## Tests (optional, local)
+
+```
+cd tests && npm install
+npm test        # sizing regression: compares against tests/baseline.json
+npm run smoke   # headless Chrome load + examples + Recommend (needs google-chrome)
+```
+
+Set `CHROME=/path/to/chrome` if it is not at `/usr/bin/google-chrome`.
+`tests/baseline.json` holds synthetic inputs and outputs only. If you change sizing on purpose, run `npm run baseline` and review the diff.
