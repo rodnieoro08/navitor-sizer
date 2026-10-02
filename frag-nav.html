@@ -1,22 +1,80 @@
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gl-tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".55" stop-color="#bfe3ff" stop-opacity=".10"/><stop offset="1" stop-color="#7fb6e0" stop-opacity=".16"/>
+    </linearGradient>
+    <linearGradient id="gl-tile-on" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9ffcf6" stop-opacity=".62"/><stop offset=".55" stop-color="#1ac4c0" stop-opacity=".28"/><stop offset="1" stop-color="#0d7f8a" stop-opacity=".45"/>
+    </linearGradient>
+    <linearGradient id="gl-rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".35" stop-color="#fff" stop-opacity=".12"/><stop offset=".7" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity=".55"/>
+    </linearGradient>
+    <linearGradient id="gl-shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="gl-glyph" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#cfe6f7" stop-opacity=".55"/>
+    </linearGradient>
+    <linearGradient id="gl-glyph-on" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#8ff3ee" stop-opacity=".85"/>
+    </linearGradient>
+    <linearGradient id="gl-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity=".12"/>
+    </linearGradient>
+    <filter id="gl-soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.2"/></filter>
+    <filter id="gl-shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="2.5" stdDeviation="2.2" flood-color="#000" flood-opacity=".38"/></filter>
+    <symbol id="gl-base" viewBox="0 0 48 48">
+      <g filter="url(#gl-shadow)">
+        <rect class="gl-t" x="3" y="3" width="42" height="42" rx="13" fill="url(#gl-tile)"/>
+      </g>
+      <rect x="3.5" y="3.5" width="41" height="41" rx="12.5" fill="none" stroke="url(#gl-rim)" stroke-width="1.1"/>
+      <path d="M8 14c0-5 3-8 8-8h16c5 0 8 3 8 8 0 0-8 5-24 5-4 0-8-1-8-5z" fill="url(#gl-shine)" opacity=".5"/>
+    </symbol>
+    <symbol id="gl-size" viewBox="0 0 48 48">
+      <use href="#gl-base"/>
+      <g class="gl-g">
+        <rect x="14" y="12.5" width="20" height="23" rx="4.5" fill="url(#gl-fill)" stroke="url(#gl-glyph)" stroke-width="1.8"/>
+        <path d="M19 20h10M19 25h10M19 30h6" stroke="url(#gl-glyph)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      </g>
+    </symbol>
+    <symbol id="gl-result" viewBox="0 0 48 48">
+      <use href="#gl-base"/>
+      <g class="gl-g">
+        <circle cx="24" cy="24" r="12" fill="url(#gl-fill)" stroke="url(#gl-glyph)" stroke-width="1.8"/>
+        <path d="M24 17v7.5l5 3" stroke="url(#gl-glyph)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="24" cy="24" r="1.4" fill="#fff"/>
+      </g>
+    </symbol>
+    <symbol id="gl-case" viewBox="0 0 48 48">
+      <use href="#gl-base"/>
+      <g class="gl-g">
+        <rect x="14" y="13.5" width="20" height="23" rx="4.5" fill="url(#gl-fill)" stroke="url(#gl-glyph)" stroke-width="1.8"/>
+        <rect x="19" y="10.5" width="10" height="6.5" rx="2.5" fill="url(#gl-glyph)" opacity=".9"/>
+        <path d="M19 23h10M19 28h7" stroke="url(#gl-glyph)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      </g>
+    </symbol>
+    <symbol id="gl-charts" viewBox="0 0 48 48">
+      <use href="#gl-base"/>
+      <g class="gl-g">
+        <rect x="13" y="26" width="6" height="10" rx="2" fill="url(#gl-fill)" stroke="url(#gl-glyph)" stroke-width="1.6"/>
+        <rect x="21" y="19" width="6" height="17" rx="2" fill="url(#gl-fill)" stroke="url(#gl-glyph)" stroke-width="1.6"/>
+        <rect x="29" y="12" width="6" height="24" rx="2" fill="url(#gl-fill)" stroke="url(#gl-glyph)" stroke-width="1.6"/>
+      </g>
+    </symbol>
+    <symbol id="gl-logic" viewBox="0 0 48 48">
+      <use href="#gl-base"/>
+      <g class="gl-g">
+        <circle cx="24" cy="24" r="12" fill="url(#gl-fill)" stroke="url(#gl-glyph)" stroke-width="1.8"/>
+        <circle cx="24" cy="18.5" r="1.7" fill="#fff"/>
+        <path d="M24 23.5v8" stroke="url(#gl-glyph)" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
 <nav class="nav">
-    <button class="active" data-screen="input">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
-      Size
-    </button>
-    <button data-screen="result">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
-      Result
-    </button>
-    <button data-screen="case">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4h8v4H8zM6 8h12v12H6z"/><path d="M9 12h6M9 16h4"/></svg>
-      Case
-    </button>
-    <button data-screen="charts">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18V6M10 18V10M16 18V8M22 18H2"/></svg>
-      Charts
-    </button>
-    <button data-screen="logic">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
-      Logic
-    </button>
-  </nav>
+  <button class="active" data-screen="input"><svg class="gi"><use href="#gl-size"/></svg>Size</button>
+  <button data-screen="result"><svg class="gi"><use href="#gl-result"/></svg>Result</button>
+  <button data-screen="case"><svg class="gi"><use href="#gl-case"/></svg>Case</button>
+  <button data-screen="charts"><svg class="gi"><use href="#gl-charts"/></svg>Charts</button>
+  <button data-screen="logic"><svg class="gi"><use href="#gl-logic"/></svg>Logic</button>
+</nav>
