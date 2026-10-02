@@ -451,7 +451,7 @@ function extractDevicesFromText(text) {
     { kind: "loading", re: /NVTR[\s\-]*LS[\s\-]*(SM|LG)/, make: (m) => "NVTR-LS-" + m[1] },
     { kind: "delivery", re: /FNAV[\s\-]*DS[\s\-]*(SM|LG)/, make: (m) => "FNAV-DS-" + m[1] },
     { kind: "valve", re: /NVRO[\s\-]*(23|25|27|29|35)/, make: (m) => "NVRO-" + m[1] },
-    { kind: "valve", re: /NVTR[\s\-]*(23|25|27|29|35)/, make: (m) => "NVTR-" + m[1] }
+    { kind: "valve", re: /NVTR[\s\-]*(23|25|27|29|35)/, make: (m) => "NVRO-" + m[1] }
   ];
   refs.forEach((r) => {
     const m = t.match(r.re);
