@@ -106,7 +106,7 @@ function evaluateSize(s, d) {
   const cors = [d.lca, d.rca].filter((x) => x != null);
   if (cors.length && Math.min.apply(null, cors) < 10) hard.push("Coronary height " + Math.min.apply(null, cors) + " mm is below the 10 mm minimum");
   if (d.access != null && d.access < s.access) { flags.push("Access " + d.access + " mm < FlexNav minimum " + s.access.toFixed(1) + " mm for this size"); score -= 0.2; }
-  if (d.sovW != null && d.sovW >= s.sovW && d.sovW < s.sovW + 2) { flags.push("SOV width only " + (d.sovW - s.sovW).toFixed(1) + " mm above the " + s.size + " mm floor"); score -= 0.18; }
+  if (d.sovW != null && d.sovW >= s.sovW && d.sovW < s.sovW + 2) { flags.push("SOV width only " + (d.sovW - s.sovW).toFixed(1) + " mm above the " + s.sovW + " mm floor"); score -= 0.18; }
   if (d.stj != null && d.stj < s.size) { flags.push("STJ " + d.stj + " mm is smaller than " + s.size + " mm labelled diameter"); score -= 0.15; }
   const ell = ellipticity(d);
   if (ell != null && ell < 0.73) { flags.push("Ellipticity " + ell.toFixed(2) + " < 0.73"); score -= 0.15; }
