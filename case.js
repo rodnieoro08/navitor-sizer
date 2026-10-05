@@ -15,7 +15,7 @@ const GTIN_REF = {
 
 const CASE_FIELDS = [
   "cDate","cHospital","cOp1","cLoader","cOp2","cTs","cStudy","cAge","cRhythm",
-  "cPd","cMin","cMax","cPeri","cLvot","cSov","cStj","cLca","cRca","cAccess","cAnatomy",
+  "cPd","cMin","cMax","cPeri","cLvot","cSov","cStj","cAa","cLca","cRca","cAccess","cAnatomy",
   "cVesselAccess","cAccessType","cBalloon","cBalloonDiam","cBalloonLen","cSheath","cWire","cPreGrad","cLvef","cPrevPpm","cHr","cRemarks",
   "cValveSize","cProcSheath","cBav","cRecaptures","cHeight","cTechnique",
   "cPost","cPostSize","cPvl","cGradient","cEcg","cPpi","cComments",
@@ -111,6 +111,7 @@ function buildNote() {
     line("LVOT", c.cLvot),
     line("SOV", c.cSov),
     line("STJ", c.cStj),
+    line("Ascending aorta", c.cAa),
     line("LCA", c.cLca),
     line("RCA", c.cRca),
     `Ca++  N:${c.caN}  R:${c.caR}  L:${c.caL}`,
@@ -243,6 +244,8 @@ function pullFromSize() {
   if (maxD) $("cMax").value = maxD;
   if (lvot) $("cLvot").value = lvot;
   if (stj) $("cStj").value = stj;
+  const aa = $("aa").value;
+  if (aa) $("cAa").value = aa;
   if (lca) $("cLca").value = lca;
   if (rca) $("cRca").value = rca;
   if (access) $("cAccess").value = access;
