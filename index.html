@@ -87,17 +87,17 @@
       el.insertAdjacentHTML("beforeend", t);
     }
     try {
-      await put("mount-size", "./frag-size-tail.html?v=45");
-      await put("mount-case", "./frag-case-a.html?v=45");
-      await put("mount-case", "./frag-case-b.html?v=45");
-      await put("mount-charts", "./frag-charts.html?v=45");
-      await put("mount-logic", "./frag-logic.html?v=45");
-      await put("mount-nav", "./frag-nav.html?v=45");
+      await put("mount-size", "./frag-size-tail.html?v=47");
+      await put("mount-case", "./frag-case-a.html?v=47");
+      await put("mount-case", "./frag-case-b.html?v=47");
+      await put("mount-charts", "./frag-charts.html?v=47");
+      await put("mount-logic", "./frag-logic.html?v=47");
+      await put("mount-nav", "./frag-nav.html?v=47");
     } catch (err) { console.error(err); }
     function add(src) {
       return new Promise((res) => {
         const s = document.createElement("script");
-        s.src = src.indexOf("http") === 0 ? src : src + "?v=45";
+        s.src = src.indexOf("http") === 0 ? src : src + "?v=47";
         s.onload = res; s.onerror = res;
         document.body.appendChild(s);
       });

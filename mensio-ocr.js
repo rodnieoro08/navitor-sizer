@@ -179,27 +179,79 @@ async function handleFile(file) {
     return;
   }
   if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
-    if ($("img-preview")) $("img-preview").innerHTML = "";
-    try {
-      if (!window.pdfjsLib) {
-        $("ocr-status").textContent = "PDF reader not loaded. Paste report text below.";
-        return;
-      }
-      const buf = await file.arrayBuffer();
-      const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
-      let text = "";
-      const max = Math.min(pdf.numPages, 8);
-      for (let i = 1; i <= max; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        text += content.items.map((it) => it.str).join(" ") + "\n";
-      }
-      if ($("paste") && text && !$("paste").value) $("paste").value = text.slice(0, 2000);
-      const parsed = parseMensio(text);
-      const n = applyMensio(parsed);
-      $("ocr-status").textContent = (n ? "Filled " + n + " field(s) from PDF. Check every number.\n" : "No Size fields mapped from PDF. Paste text.\n") + text.slice(0, 400);
-    } catch (err) {
-      $("ocr-status").textContent = "Could not parse PDF. Paste measurements. " + err.message;
+    await handlePdf(file);
+  }
+}
+
+function countMensio(p) {
+  return Object.values(p || {}).filter((v) => v != null).length;
+}
+
+/* Render one pdf.js page to a PNG Blob, longest side ~2000 px. */
+async function pdfPageToBlob(page) {
+  const base = page.getViewport({ scale: 1 });
+  const scale = Math.min(4, 2000 / Math.max(base.width, base.height));
+  const vp = page.getViewport({ scale });
+  const c = document.createElement("canvas");
+  c.width = Math.round(vp.width);
+  c.height = Math.round(vp.height);
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  return new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error("Could not render page"))), "image/png"));
+}
+
+async function handlePdf(file) {
+  const status = $("ocr-status");
+  if ($("img-preview")) $("img-preview").innerHTML = "";
+  try {
+    if (!window.pdfjsLib) {
+      status.textContent = "PDF reader not loaded. Paste report text below.";
+      return;
     }
+    const buf = await file.arrayBuffer();
+    const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+    let text = "";
+    const max = Math.min(pdf.numPages, 8);
+    for (let i = 1; i <= max; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map((it) => it.str + (it.hasEOL ? "\n" : " ")).join("") + "\n";
+    }
+    const fromText = parseMensio(text);
+    let parsed = fromText;
+    let used = text;
+    let source = "PDF text";
+    if (countMensio(fromText) < 6 && typeof fileToCanvas === "function" && typeof ocrCanvas === "function") {
+      /* Few or no numbers in the text layer: 3mensio often stores them as pictures.
+         Read the page images with the same reader as screenshots. */
+      const pages = Math.min(pdf.numPages, 4);
+      let ocrText = "";
+      for (let i = 1; i <= pages; i++) {
+        status.textContent = "Reading page " + i + " of " + pages + "\u2026";
+        const blob = await pdfPageToBlob(await pdf.getPage(i));
+        const { canvas, url } = await fileToCanvas(blob);
+        if (i === 1 && $("img-preview")) $("img-preview").innerHTML = `<img alt="PDF page 1" src="${url}">`;
+        ocrText += (await ocrCanvas(canvas)) + "\n";
+      }
+      const fromOcr = parseMensio(ocrText);
+      parsed = {};
+      Object.keys(fromOcr).forEach((k) => { parsed[k] = fromText[k] != null ? fromText[k] : fromOcr[k]; });
+      const nums = [parsed.sovL, parsed.sovR, parsed.sovNC].filter((v) => v != null);
+      if (fromText.sovMin == null && nums.length) parsed.sovMin = Math.min.apply(null, nums);
+      if (countMensio(fromOcr) > countMensio(fromText)) {
+        source = countMensio(fromText) ? "PDF text and page images" : "PDF page images";
+        used = (text.trim() ? text + "\n" : "") + ocrText;
+      }
+    }
+    if ($("paste") && used.trim() && !$("paste").value) $("paste").value = used.slice(0, 2000);
+    const n = applyMensio(parsed);
+    const found = Object.entries(parsed).filter(([, v]) => v != null).map(([k, v]) => k + " " + v).join(" \u00b7 ");
+    status.textContent = n
+      ? "Filled " + n + " Size-tab field(s) from " + source + ". Check every number before Recommend.\n" + found
+      : "Could not read numbers from this PDF. Paste the 3mensio text or type them. " + (used.trim() ? "Saw: " + used.slice(0, 240) : "");
+  } catch (err) {
+    status.textContent = "Could not read PDF. Type or paste the numbers. " + err.message;
   }
 }
