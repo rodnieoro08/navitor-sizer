@@ -93,6 +93,7 @@ function parseMensio(text) {
     250, 800
   );
   const stj = fixDec(
+    firstNum(/SINOTUBULAR\s*JUNCTION\s*[\u00d8\u00f8][\s\S]{0,80}?AVERAGE\s*:?\s*(\d+\.?\d*)/i, t) ||
     firstNum(/STJ\s*[\u00d8\u00f8O:][^0-9]{0,16}(\d+\.?\d*)/i, t) ||
     firstNum(/STJ[^0-9]{0,16}(\d+\.?\d*)/i, t),
     18, 50
@@ -183,6 +184,34 @@ async function handleFile(file) {
   }
 }
 
+/* pdf.js can split text into single letters (3mensio PDFs do). Rebuild lines from item positions. */
+function pdfItemsToText(items) {
+  const rows = [];
+  items.forEach((it) => {
+    if (!it.str) return;
+    const x = it.transform[4], y = it.transform[5];
+    const h = Math.abs(it.transform[3]) || Math.abs(it.height) || 8;
+    let row = rows.find((r) => Math.abs(r.y - y) < h * 0.5);
+    if (!row) { row = { y, h, items: [] }; rows.push(row); }
+    row.items.push({ x, w: it.width || 0, s: it.str, h });
+  });
+  rows.sort((a, b) => b.y - a.y);
+  return rows.map((r) => {
+    r.items.sort((a, b) => a.x - b.x);
+    let out = "", end = null;
+    r.items.forEach((t) => {
+      if (end != null) {
+        const gap = t.x - end;
+        if (gap > t.h * 1.5) out += "   ";
+        else if (gap > t.h * 0.2) out += " ";
+      }
+      out += t.s;
+      end = t.x + t.w;
+    });
+    return out.replace(/\s+$/, "");
+  }).join("\n");
+}
+
 function countMensio(p) {
   return Object.values(p || {}).filter((v) => v != null).length;
 }
@@ -217,7 +246,7 @@ async function handlePdf(file) {
     for (let i = 1; i <= max; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      text += content.items.map((it) => it.str + (it.hasEOL ? "\n" : " ")).join("") + "\n";
+      text += pdfItemsToText(content.items) + "\n";
     }
     const fromText = parseMensio(text);
     let parsed = fromText;
