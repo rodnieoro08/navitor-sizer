@@ -93,6 +93,7 @@ function parseMensio(text) {
     250, 800
   );
   const stj = fixDec(
+    firstNum(/SINOTUBULAR\s*JUNCTION\s*[\u00d8\u00f8][\s\S]{0,80}?AVERAGE\s*:?\s*(\d+\.?\d*)/i, t) ||
     firstNum(/STJ\s*[\u00d8\u00f8O:][^0-9]{0,16}(\d+\.?\d*)/i, t) ||
     firstNum(/STJ[^0-9]{0,16}(\d+\.?\d*)/i, t),
     18, 50
@@ -179,27 +180,107 @@ async function handleFile(file) {
     return;
   }
   if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
-    if ($("img-preview")) $("img-preview").innerHTML = "";
-    try {
-      if (!window.pdfjsLib) {
-        $("ocr-status").textContent = "PDF reader not loaded. Paste report text below.";
-        return;
+    await handlePdf(file);
+  }
+}
+
+/* pdf.js can split text into single letters (3mensio PDFs do). Rebuild lines from item positions. */
+function pdfItemsToText(items) {
+  const rows = [];
+  items.forEach((it) => {
+    if (!it.str) return;
+    const x = it.transform[4], y = it.transform[5];
+    const h = Math.abs(it.transform[3]) || Math.abs(it.height) || 8;
+    let row = rows.find((r) => Math.abs(r.y - y) < h * 0.5);
+    if (!row) { row = { y, h, items: [] }; rows.push(row); }
+    row.items.push({ x, w: it.width || 0, s: it.str, h });
+  });
+  rows.sort((a, b) => b.y - a.y);
+  return rows.map((r) => {
+    r.items.sort((a, b) => a.x - b.x);
+    let out = "", end = null;
+    r.items.forEach((t) => {
+      if (end != null) {
+        const gap = t.x - end;
+        if (gap > t.h * 1.5) out += "   ";
+        else if (gap > t.h * 0.2) out += " ";
       }
-      const buf = await file.arrayBuffer();
-      const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
-      let text = "";
-      const max = Math.min(pdf.numPages, 8);
-      for (let i = 1; i <= max; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        text += content.items.map((it) => it.str).join(" ") + "\n";
-      }
-      if ($("paste") && text && !$("paste").value) $("paste").value = text.slice(0, 2000);
-      const parsed = parseMensio(text);
-      const n = applyMensio(parsed);
-      $("ocr-status").textContent = (n ? "Filled " + n + " field(s) from PDF. Check every number.\n" : "No Size fields mapped from PDF. Paste text.\n") + text.slice(0, 400);
-    } catch (err) {
-      $("ocr-status").textContent = "Could not parse PDF. Paste measurements. " + err.message;
+      out += t.s;
+      end = t.x + t.w;
+    });
+    return out.replace(/\s+$/, "");
+  }).join("\n");
+}
+
+function countMensio(p) {
+  return Object.values(p || {}).filter((v) => v != null).length;
+}
+
+/* Render one pdf.js page to a PNG Blob, longest side ~2000 px. */
+async function pdfPageToBlob(page) {
+  const base = page.getViewport({ scale: 1 });
+  const scale = Math.min(4, 2000 / Math.max(base.width, base.height));
+  const vp = page.getViewport({ scale });
+  const c = document.createElement("canvas");
+  c.width = Math.round(vp.width);
+  c.height = Math.round(vp.height);
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  return new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error("Could not render page"))), "image/png"));
+}
+
+async function handlePdf(file) {
+  const status = $("ocr-status");
+  if ($("img-preview")) $("img-preview").innerHTML = "";
+  try {
+    if (!window.pdfjsLib) {
+      status.textContent = "PDF reader not loaded. Paste report text below.";
+      return;
     }
+    const buf = await file.arrayBuffer();
+    const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+    let text = "";
+    const max = Math.min(pdf.numPages, 8);
+    for (let i = 1; i <= max; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += pdfItemsToText(content.items) + "\n";
+    }
+    const fromText = parseMensio(text);
+    let parsed = fromText;
+    let used = text;
+    let source = "PDF text";
+    if (countMensio(fromText) < 6 && typeof fileToCanvas === "function" && typeof ocrCanvas === "function") {
+      /* Few or no numbers in the text layer: 3mensio often stores them as pictures.
+         Read the page images with the same reader as screenshots. */
+      const pages = Math.min(pdf.numPages, 4);
+      let ocrText = "";
+      for (let i = 1; i <= pages; i++) {
+        status.textContent = "Reading page " + i + " of " + pages + "\u2026";
+        const blob = await pdfPageToBlob(await pdf.getPage(i));
+        const { canvas, url } = await fileToCanvas(blob);
+        if (i === 1 && $("img-preview")) $("img-preview").innerHTML = `<img alt="PDF page 1" src="${url}">`;
+        ocrText += (await ocrCanvas(canvas)) + "\n";
+      }
+      const fromOcr = parseMensio(ocrText);
+      parsed = {};
+      Object.keys(fromOcr).forEach((k) => { parsed[k] = fromText[k] != null ? fromText[k] : fromOcr[k]; });
+      const nums = [parsed.sovL, parsed.sovR, parsed.sovNC].filter((v) => v != null);
+      if (fromText.sovMin == null && nums.length) parsed.sovMin = Math.min.apply(null, nums);
+      if (countMensio(fromOcr) > countMensio(fromText)) {
+        source = countMensio(fromText) ? "PDF text and page images" : "PDF page images";
+        used = (text.trim() ? text + "\n" : "") + ocrText;
+      }
+    }
+    if ($("paste") && used.trim() && !$("paste").value) $("paste").value = used.slice(0, 2000);
+    const n = applyMensio(parsed);
+    const found = Object.entries(parsed).filter(([, v]) => v != null).map(([k, v]) => k + " " + v).join(" \u00b7 ");
+    status.textContent = n
+      ? "Filled " + n + " Size-tab field(s) from " + source + ". Check every number before Recommend.\n" + found
+      : "Could not read numbers from this PDF. Paste the 3mensio text or type them. " + (used.trim() ? "Saw: " + used.slice(0, 240) : "");
+  } catch (err) {
+    status.textContent = "Could not read PDF. Type or paste the numbers. " + err.message;
   }
 }
