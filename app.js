@@ -64,7 +64,7 @@ function gather() {
     sovL, sovR, sovNC,
     lca: num("lca"), rca: num("rca"), lvot: num("lvot"),
     aa: num("aa"), access: num("access"),
-    calcAnn: calc("calcAnn"), calcLvot: calc("calcLvot"), calcStj: calc("calcStj"),
+    calcAnn: calc("calcAnn"), calcLvot: calc("calcLvot"), calcStj: calc("calcStj"), calcCusp: calc("calcCusp"),
     notes: notes ? notes.value.trim() : ""
   };
 }
@@ -304,7 +304,7 @@ function loadExample(kind) {
   const set = (id, v) => { $(id).value = v ?? ""; };
   if (kind === "clear") {
     ["peri","area","meanD","minD","maxD","stj","sovMin","sovL","sovR","sovNC","lca","rca","lvot","aa","access","notes"].forEach((id) => set(id, ""));
-    setCalc("calcAnn", "unknown"); setCalc("calcLvot", "unknown"); setCalc("calcStj", "unknown");
+    setCalc("calcAnn", "unknown"); setCalc("calcLvot", "unknown"); setCalc("calcStj", "unknown"); setCalc("calcCusp", "unknown");
     return;
   }
   if (kind === "mid27") {
@@ -455,8 +455,8 @@ function mountPeriPD() {
 
 function init() {
   mountPeriPD();
-  try { bindSeg("calcAnn"); bindSeg("calcLvot"); bindSeg("calcStj"); } catch (e) {}
-  try { setCalc("calcAnn", "unknown"); setCalc("calcLvot", "unknown"); setCalc("calcStj", "unknown"); } catch (e) {}
+  try { bindSeg("calcAnn"); bindSeg("calcLvot"); bindSeg("calcStj"); bindSeg("calcCusp"); } catch (e) {}
+  try { setCalc("calcAnn", "unknown"); setCalc("calcLvot", "unknown"); setCalc("calcStj", "unknown"); setCalc("calcCusp", "unknown"); } catch (e) {}
   try { renderCharts(); } catch (e) {}
   const go = document.getElementById("btn-go");
   if (go) go.onclick = navitorGo;
