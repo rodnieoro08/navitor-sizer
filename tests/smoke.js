@@ -30,11 +30,9 @@ const srv = http.createServer((q, r) => {
   ok(await pg.evaluate(() => !!document.getElementById("cDate") && !!document.getElementById("cDate").value), "case form initialised (cDate defaulted)");
   ok(await pg.evaluate(() => document.querySelectorAll("#caN button").length === 4), "case cusp buttons built");
   ok(await pg.evaluate(() => document.querySelectorAll("#chart-ifus tr").length === 5), "charts table rendered");
-  ok(await pg.evaluate(() => document.querySelectorAll("#logicMode button").length === 2), "logic switch on Logic tab");
-  ok(await pg.evaluate(() => getLogicMode() === "field" && document.querySelector("#logicMode button.on").dataset.v === "field"), "default logic = field");
-  for (const mode of ["field", "classic"]) {
-  await pg.evaluate((m) => { document.querySelector(`#logicMode button[data-v=${m}]`).click(); }, mode);
-  ok(await pg.evaluate(() => localStorage.getItem("navitorLogic")), `switch stored ${mode}`);
+  ok(await pg.evaluate(() => !document.getElementById("logicMode")), "no Classic / Field logic switch");
+  ok(await pg.evaluate(() => !/Classic/.test(document.getElementById("mount-logic").textContent)), "Logic tab has no Classic section");
+  ok(await pg.evaluate(() => !document.getElementById("result-logic")), "no Logic: line on Result");
   for (const ex of Object.keys(EXPECT)) {
     await pg.evaluate(() => { showScreen("input"); document.getElementById("btn-clear").click(); });
     await pg.click(`[data-ex=${ex}]`);
@@ -44,18 +42,16 @@ const srv = http.createServer((q, r) => {
       pdRow: [...document.querySelectorAll("#result-body .why-row span")].some((s) => s.textContent === "Perimeter-derived diameter"),
       colours: [...document.querySelectorAll("#result-body tbody tr")].map((t) => [...t.classList].filter((c) => c.startsWith("fit-")).join("")),
       active: document.querySelector(".screen.active").id,
-      logicLine: (document.getElementById("result-logic") || {}).textContent || "",
       overlap: !!document.querySelector("#result-body .overlap")
     }));
     ok(res.size && res.size.trim().startsWith(EXPECT[ex]), `${ex}: recommends ${EXPECT[ex]} (got ${res.size && res.size.trim()})`);
     ok(res.pdRow, `${ex}: perimeter-derived diameter row on Result`);
     ok(res.colours.every(Boolean), `${ex}: fit matrix coloured (${res.colours.join(",")})`);
     ok(res.active === "screen-result", `${ex}: Result screen shown`);
-    ok(res.logicLine.indexOf(mode === "field" ? "Field logic" : "Classic") >= 0, `${mode}/${ex}: logic line "${res.logicLine}"`);
-    ok(mode === "classic" || ex === "mid27" || res.overlap, `${mode}/${ex}: overlap explanation ${res.overlap ? "shown" : "absent"}`);
-  }
+    ok(ex === "mid27" || res.overlap, `${ex}: overlap explanation ${res.overlap ? "shown" : "absent"}`);
   }
   ok(await pg.evaluate(() => /Perimeter-derived diameter/.test(document.getElementById("mount-logic").textContent)), "Logic fragment mounted");
+  ok(await pg.evaluate(() => /Rodnie.s field logic, not an Abbott claim/.test(document.getElementById("mount-logic").textContent)), "field-logic disclaimer present");
   ok(!(await pg.evaluate(() => [...document.querySelectorAll("label, input, #result-body")].some((e) => /SOV height/i.test(e.textContent + " " + (e.placeholder || "") + " " + (e.id || ""))) || !!document.getElementById("sovH"))), "no SOV height input, label or result text");
   ok(errors.length === 0, "no console/page errors" + (errors.length ? ": " + errors.join(" | ") : ""));
   ok(missing.length === 0, "no 4xx on local assets" + (missing.length ? ": " + missing.join(" | ") : ""));

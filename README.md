@@ -48,8 +48,8 @@ npm run smoke   # headless Chrome load + examples + Recommend (needs google-chro
 ```
 
 Set `CHROME=/path/to/chrome` if it is not at `/usr/bin/google-chrome`.
-`npm test` runs every case in both logic modes: **Classic** against `tests/baseline.json` (must stay identical) and **Field logic (shared edges)** against `tests/baseline-field.json`. Both hold synthetic inputs and outputs only. If you change sizing on purpose, run `npm run baseline` and review the diff.
+`npm test` compares every synthetic case against `tests/baseline-field.json` (Field logic at shared edges). Inputs and outputs are synthetic only. If you change sizing on purpose, run `npm run baseline` and review the diff.
 
-## Logic modes
+## Sizing logic
 
-The Logic tab has a switch between **Field logic (shared edges)** (default) and **Classic** (the pre-v49 behaviour, tag `old-logic-v48`). It is remembered per phone and needs no redeploy. Single-size perimeters are identical in both. See [DECISION_TREE.md](DECISION_TREE.md).
+The app uses **Field logic (shared edges)** only. At a shared IFU perimeter edge the smaller valve is the default; ranked tie-breakers decide whether to step up. See [DECISION_TREE.md](DECISION_TREE.md). The pre-field-logic behaviour is kept as the GitHub release [`old-logic-v48`](https://github.com/rodnieoro08/navitor-sizer/releases/tag/old-logic-v48).

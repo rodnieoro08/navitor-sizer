@@ -74,7 +74,7 @@
       <div id="mount-size"></div>
     </section>
     <section id="screen-case" class="screen"><div id="mount-case"></div></section>
-    <section id="screen-result" class="screen"><div id="result-logic" class="logic-used" style="display:none"></div><div id="result-body" class="empty">Enter measurements and tap Recommend.</div></section>
+    <section id="screen-result" class="screen"><div id="result-body" class="empty">Enter measurements and tap Recommend.</div></section>
     <section id="screen-charts" class="screen"><div id="mount-charts"></div></section>
     <section id="screen-logic" class="screen"><div id="mount-logic"></div></section>
   </main>
@@ -87,17 +87,17 @@
       el.insertAdjacentHTML("beforeend", t);
     }
     try {
-      await put("mount-size", "./frag-size-tail.html?v=50");
-      await put("mount-case", "./frag-case-a.html?v=50");
-      await put("mount-case", "./frag-case-b.html?v=50");
-      await put("mount-charts", "./frag-charts.html?v=50");
-      await put("mount-logic", "./frag-logic.html?v=50");
-      await put("mount-nav", "./frag-nav.html?v=50");
+      await put("mount-size", "./frag-size-tail.html?v=51");
+      await put("mount-case", "./frag-case-a.html?v=51");
+      await put("mount-case", "./frag-case-b.html?v=51");
+      await put("mount-charts", "./frag-charts.html?v=51");
+      await put("mount-logic", "./frag-logic.html?v=51");
+      await put("mount-nav", "./frag-nav.html?v=51");
     } catch (err) { console.error(err); }
     function add(src) {
       return new Promise((res) => {
         const s = document.createElement("script");
-        s.src = src.indexOf("http") === 0 ? src : src + "?v=50";
+        s.src = src.indexOf("http") === 0 ? src : src + "?v=51";
         s.onload = res; s.onerror = res;
         document.body.appendChild(s);
       });
