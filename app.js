@@ -341,11 +341,16 @@ function fieldOverlap(d, evS, evL) {
     why = "The " + S.size + " fails a hard limit, so the " + L.size + " is the only option at this edge.";
   }
   const chosen = choice === "large" ? L : S;
+  let stjAlert = null;
+  if (choice === "large" && d.stj != null && d.stj < L.size) {
+    stjAlert = "STJ " + d.stj + " mm is smaller than the " + L.size + " mm label. It does not stop the step-up, but check the STJ before choosing the " + L.size + ".";
+    why += " Alert: " + stjAlert;
+  }
   return {
     small: S.size, large: L.size, choice: chosen.size, stepped: tag === "stepped up", tag: tag,
     pd: pdR, periEq: periEq, circArea: periEq * periEq / (4 * Math.PI),
     oversize: [{ size: S.size, pct: over(S) }, { size: L.size, pct: over(L) }],
-    lines: lines, why: why, flag: flag
+    lines: lines, why: why, flag: flag, stjAlert: stjAlert
   };
 }
 
@@ -470,9 +475,10 @@ function renderResult(r) {
 
   const flagHtml = [
     ...(r.overlap ? [`<div class="flag warn"><b>Field logic</b>${r.overlap.flag}</div>`] : []),
+    ...(r.overlap && r.overlap.stjAlert ? [`<div class="flag warn"><b>STJ alert</b>${r.overlap.stjAlert}</div>`] : []),
     ...r.checks.map((f) => `<div class="flag warn"><b>Measurement check</b>${f}</div>`),
     ...(r.primary ? r.primary.hard.map((f) => `<div class="flag bad"><b>Hard constraint</b>${f}</div>`) : []),
-    ...(r.primary ? r.primary.flags.map((f) => `<div class="flag warn"><b>Review</b>${f}</div>`) : []),
+    ...(r.primary ? r.primary.flags.filter((f) => !(r.overlap && r.overlap.stjAlert && /^STJ .* labelled diameter$/.test(f))).map((f) => `<div class="flag warn"><b>Review</b>${f}</div>`) : []),
     ...(!r.primary ? r.nearest.slice(0, 3).flatMap((e) => e.hard.map((f) => `<div class="flag bad"><b>${e.size.size} mm</b>${f}</div>`)) : [])
   ].join("");
 
