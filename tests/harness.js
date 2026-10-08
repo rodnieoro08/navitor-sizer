@@ -5,10 +5,15 @@
  * drives the page the way a user does (fill inputs, click Recommend).
  * Records recommendation output + rendered result text for a fixed case set.
  *
- *   node harness.js                 compare against tests/baseline.json
- *   node harness.js --write [file]  (re)write the baseline (default baseline.json)
- *   node harness.js --compare file  compare against another snapshot
- *   node harness.js --out file      just dump current output
+ * Runs every case in both logic modes:
+ *   classic -> tests/baseline.json        (pre-v49 behaviour; must stay identical)
+ *   field   -> tests/baseline-field.json  (Field logic at shared edges, default since v49)
+ *
+ *   node harness.js                       compare both modes against their baselines
+ *   node harness.js --mode classic|field  only that mode
+ *   node harness.js --write               (re)write the baseline(s)
+ *   node harness.js --compare file        compare (single --mode) against another snapshot
+ *   node harness.js --out file            just dump current output (single --mode)
  *
  * All inputs are synthetic. No patient data.
  */
@@ -49,14 +54,16 @@ async function boot() {
 }
 
 const FIELDS = ["peri","area","periPD","meanD","minD","maxD","stj","sovMin","sovL","sovR","sovNC","sovH","lca","rca","lvot","aa","access","notes"];
-const CALCS = ["calcAnn","calcLvot","calcStj"];
+const CALCS = ["calcAnn","calcLvot","calcStj","calcCusp"];
+const TOGGLES = ["tEccLeaf","tProtLvot","tCond","tPpm"];
 
 function setInputs(w, c) {
   const doc = w.document;
   FIELDS.forEach((id) => { const el = doc.getElementById(id); if (el) el.value = ""; });
   CALCS.forEach((id) => run(w, `setCalc("${id}", ${JSON.stringify(c[id] || "unknown")})`));
+  TOGGLES.forEach((id) => run(w, `setToggle("${id}", ${!!c[id]})`));
   Object.keys(c).forEach((k) => {
-    if (CALCS.includes(k)) return;
+    if (CALCS.includes(k) || TOGGLES.includes(k)) return;
     const el = doc.getElementById(k);
     if (el) el.value = String(c[k]);          // sovH may not exist as a field in the live page
     else (setInputs.missing = setInputs.missing || new Set()).add(k);
@@ -80,6 +87,8 @@ function summarize(r) {
     boundary: r.boundary ? `${r.boundary.p}:${r.boundary.a}/${r.boundary.b}` : null,
     eligible: r.eligible.map((e) => e.size.size),
     checks: r.checks,
+    ...(r.alternative ? { alternative: r.alternative.size.size } : {}),
+    ...(r.overlap ? { overlap: { choice: r.overlap.choice, flag: r.overlap.flag, why: r.overlap.why, lines: r.overlap.lines.map((l) => `${l.title}: ${l.dir} | ${l.text}`) } } : {}),
     evals: r.evals.map((e) => ({
       size: e.size.size, eligible: e.eligible, score: r6(e.score),
       matches: e.matches, available: e.available, hard: e.hard, flags: e.flags
@@ -99,7 +108,8 @@ function runCase(w, name, c) {
     cValveSize: (w.document.getElementById("cValveSize") || {}).value || "",
     summary: summarize(rec && rec.evals ? rec : (rec && rec.error ? rec : null)),
     resultText: body.textContent.replace(/\s+/g, " ").trim(),
-    rows
+    rows,
+    ...(MODE === "field" ? { logicLine: (w.document.getElementById("result-logic") || {}).textContent || "" } : {})
   };
 }
 
@@ -169,6 +179,35 @@ function namedCases() {
   // combined stress
   add("everything bad peri 72", { peri: 72, area: 300, meanD: 29, minD: 15, maxD: 26, stj: 20, sovMin: 25, lca: 9, rca: 8, lvot: 18, aa: 20, access: 4, calcAnn: "severe", calcLvot: "severe", calcStj: "severe" });
   add("peri 72 stacked soft penalties", { peri: 72, stj: 24, sovMin: 29.5, access: 5.0, minD: 17, maxD: 25, calcStj: "moderate" });
+
+  // ---- Shared-edge field logic (v49). Worked example 66 mm / SOV 27 and the same pattern at 72.5 / 79 / 85.
+  // edge: [peri, larger SOV floor, area in both, area below larger, LVOT >= PD, LVOT < PD]
+  const EDGES = { 66: [66, 27, 340, 330, 21.5, 19], 72.5: [72.5, 29, 410, 400, 23.5, 21], 79: [79, 31, 485, 470, 25.5, 23], 85: [85, 34, 565, 550, 27.5, 25] };
+  Object.entries(EDGES).forEach(([k, [p, f, aBoth, aLow, lvOk, lvSmall]]) => {
+    const tight3 = { sovL: f, sovR: f, sovNC: f };
+    const good = { peri: p, calcCusp: "moderate", area: aBoth + 20 > 0 ? (k === "66" ? 360 : aBoth) : aBoth, lvot: lvOk, sovL: f, sovR: f, sovNC: f + 0.5 };
+    add(`edge ${k} (a) SOV ${f}x3, no calcium, no area`, { peri: p, ...tight3 });
+    add(`edge ${k} (b) cusp mod + area + LVOT ok + uniform SOV`, good);
+    add(`edge ${k} (c) one large sinus (not uniform)`, { ...good, sovNC: f + 4 });
+    add(`edge ${k} (d) SOV min only`, { peri: p, calcCusp: "moderate", area: good.area, lvot: lvOk, sovMin: f });
+    add(`edge ${k} (e) LVOT smaller than annulus`, { ...good, lvot: lvSmall });
+    add(`edge ${k} (f) area below larger range`, { ...good, area: aLow });
+    add(`edge ${k} (a2) SOV min only ${f}, nothing else`, { peri: p, sovMin: f });
+    add(`edge ${k} protruding LVOT calcium veto`, { ...good, tProtLvot: true });
+    add(`edge ${k} conduction risk blocks step-up`, { ...good, tCond: true });
+    add(`edge ${k} eccentric leaflet calcium instead of cusp`, { ...good, calcCusp: "mild", tEccLeaf: true });
+    add(`edge ${k} LVOT moderate calcium instead of cusp`, { ...good, calcCusp: "none", calcLvot: "moderate" });
+    const roomy = { peri: p, sovL: f + 4, sovR: f + 4, sovNC: f + 5 };
+    add(`edge ${k} roomy SOV, nothing else`, roomy);
+    add(`edge ${k} roomy SOV + calcium`, { ...roomy, calcAnn: "moderate" });
+    add(`edge ${k} roomy SOV + PPM concern`, { ...roomy, tPpm: true });
+    add(`edge ${k} roomy SOV + PPM + LVOT small`, { ...roomy, tPpm: true, lvot: lvSmall });
+    add(`edge ${k} tight SOV + PPM concern`, { ...good, calcCusp: "none", tPpm: true });
+  });
+  add("edge 66 roomy SOV + area above 23 range", { peri: 66, sovL: 31, sovR: 31, sovNC: 32, area: 350 });
+  add("edge 79 hard exclude larger by AA", { peri: 79, sovL: 35, sovR: 35, sovNC: 35, aa: 31, calcAnn: "severe" });
+  add("edge 66 smaller excluded by AA (larger only)", { peri: 66, aa: 37, sovMin: 30 });
+  add("edge 85 STJ smaller than 35 label", { peri: 85, sovL: 38, sovR: 38, sovNC: 39, stj: 30, calcAnn: "moderate" });
   return c;
 }
 
@@ -261,8 +300,12 @@ function liveButtonExamples(w) {
 }
 
 let harnessErrors = [];
-async function collect() {
+let MODE = "classic";
+async function collect(mode) {
+  MODE = mode;
+  setInputs.missing = new Set();
   const { w, errors, scripts } = await boot();
+  w.localStorage.setItem("navitorLogic", mode);
   harnessErrors = errors;
   const result = { scripts, cases: {}, sweep: null, ocr: null, buttons: null };
   // Button examples run first on a pristine page
@@ -288,11 +331,21 @@ function diff(a, b) {
   return rows;
 }
 
+const BASE = { classic: path.join(__dirname, "baseline.json"), field: path.join(__dirname, "baseline-field.json") };
+
 (async () => {
   const args = process.argv.slice(2);
-  const cur = await collect();
   const arg = (n) => { const i = args.indexOf(n); return i >= 0 ? (args[i + 1] && !args[i + 1].startsWith("--") ? args[i + 1] : true) : null; };
-  const base = path.join(__dirname, "baseline.json");
+  const modes = arg("--mode") && arg("--mode") !== true ? [arg("--mode")] : ["classic", "field"];
+  for (const mode of modes) {
+    console.log(`=== mode: ${mode} ===`);
+    await runMode(mode, arg);
+  }
+})();
+
+async function runMode(mode, arg) {
+  const cur = await collect(mode);
+  const base = BASE[mode];
   if (arg("--out")) { fs.writeFileSync(arg("--out"), JSON.stringify(cur, null, 1)); console.log("wrote", arg("--out")); return; }
   if (arg("--write")) { const f = arg("--write") === true ? base : arg("--write"); fs.writeFileSync(f, JSON.stringify(cur, null, 1) + "\n"); console.log("wrote", f); return; }
   const against = arg("--compare") && arg("--compare") !== true ? arg("--compare") : base;
@@ -307,4 +360,4 @@ function diff(a, b) {
   console.log(`${rows.length} differing value(s) vs ${path.relative(process.cwd(), against)}:`);
   rows.slice(0, 200).forEach((r) => console.log(`  ${r.key}\n    before: ${JSON.stringify(r.before)}\n    after:  ${JSON.stringify(r.after)}`));
   process.exitCode = 1;
-})();
+}

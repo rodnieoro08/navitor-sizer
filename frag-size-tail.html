@@ -26,12 +26,23 @@
           <button type="button" data-v="severe">Severe</button>
         </div>
         <label>Cusp calcium</label>
-        <div class="seg" id="calcCusp" style="margin:6px 0 4px">
+        <div class="seg" id="calcCusp" style="margin:6px 0 12px">
           <button type="button" data-v="none">None</button>
           <button type="button" data-v="mild">Mild</button>
           <button type="button" data-v="moderate">Mod</button>
           <button type="button" data-v="severe">Severe</button>
         </div>
+        <label>Calcium pattern <span class="unit">optional</span></label>
+        <div class="chips" style="margin:6px 0 12px">
+          <button type="button" class="chip" id="tEccLeaf" aria-pressed="false">Eccentric leaflet calcium</button>
+          <button type="button" class="chip" id="tProtLvot" aria-pressed="false">Protruding LVOT calcium</button>
+        </div>
+        <label>Conduction / PPM <span class="unit">optional</span></label>
+        <div class="chips" style="margin:6px 0 4px">
+          <button type="button" class="chip" id="tCond" aria-pressed="false">RBBB / short membranous septum / heavy septal calcium</button>
+          <button type="button" class="chip" id="tPpm" aria-pressed="false">Small patient / low expected EOA (PPM concern)</button>
+        </div>
+        <p class="hint" style="margin:8px 0 0">Used by Field logic at shared edges only (66 · 72–73 · 79 · 85 mm).</p>
       </div>
 
       <div class="card">

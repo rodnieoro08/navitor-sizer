@@ -230,3 +230,25 @@ td.num { font-variant-numeric: tabular-nums; }
 .nav button.active { opacity: 1; }
 .nav button.active .gi { filter: drop-shadow(0 0 6px rgba(26,196,192,.95)) drop-shadow(0 0 16px rgba(26,196,192,.7)); }
 .nav button.active .gi .gl-t { fill: url(#gl-tile-on); }
+
+/* Logic switch, toggle chips, overlap explanation (v49) */
+.seg.two { grid-template-columns: 1fr 1fr; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: var(--bg); border: 1px solid var(--line); color: var(--muted);
+  border-radius: 999px; padding: 8px 11px; font-size: 12px; font-weight: 600; text-align: left;
+}
+.chip::before { content: "+ "; opacity: .7; }
+.chip.on { background: var(--teal-dim); color: var(--teal); border-color: var(--teal); }
+.chip.on::before { content: "\2713  "; opacity: 1; }
+.logic-used { font-size: 11px; color: var(--muted); margin: 0 2px 8px; letter-spacing: .02em; }
+.overlap ol.ov { padding-left: 18px; margin: 0 0 10px; }
+.overlap ol.ov li { font-size: 13px; line-height: 1.45; margin: 0 0 9px; color: #d5e4ef; }
+.overlap ol.ov li div { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.dir { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 7px; border-radius: 999px; margin-left: 4px; vertical-align: 1px; }
+.dir.d-s { background: rgba(26,196,192,.15); color: var(--teal); }
+.dir.d-l { background: rgba(228,195,106,.16); color: var(--gold); }
+.dir.d-n { background: rgba(138,163,184,.15); color: var(--muted); }
+.dir.d-v { background: rgba(255,107,122,.16); color: var(--red); }
+.dir.d-x { background: transparent; color: #6d8aa3; border: 1px dashed var(--line); }
+.overlap { text-align: left; }
