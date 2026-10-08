@@ -145,24 +145,6 @@ function consistencyFlags(d) {
   return out;
 }
 
-// ---- Logic mode: "field" (default, Rodnie's shared-edge field logic) or "classic" (pre-v49 behaviour) ----
-const LOGIC_KEY = "navitorLogic";
-const LOGIC_LABEL = { field: "Field logic (shared edges)", classic: "Classic" };
-function getLogicMode() {
-  try { return localStorage.getItem(LOGIC_KEY) === "classic" ? "classic" : "field"; } catch (e) { return "field"; }
-}
-function setLogicMode(m) {
-  try { localStorage.setItem(LOGIC_KEY, m === "classic" ? "classic" : "field"); } catch (e) {}
-  syncLogicSwitch();
-}
-function syncLogicSwitch() {
-  const el = document.getElementById("logicMode");
-  if (!el) return;
-  const m = getLogicMode();
-  el.dataset.v = m;
-  [...el.querySelectorAll("button")].forEach((b) => b.classList.toggle("on", b.dataset.v === m));
-}
-
 // ---- Optional toggles (Access & calcium card) ----
 const TOGGLES = ["tEccLeaf", "tProtLvot", "tCond", "tPpm"];
 function isOn(id) {
@@ -177,10 +159,8 @@ function setToggle(id, on) {
 }
 function resetToggles() { TOGGLES.forEach((id) => setToggle(id, false)); }
 
-function recommend(d, mode) {
-  mode = mode || getLogicMode();
-  if (mode === "field") return recommendField(d);
-  return recommendClassic(d);
+function recommend(d) {
+  return recommendField(d);
 }
 
 function recommendClassic(d) {
@@ -202,7 +182,7 @@ function recommendClassic(d) {
 }
 
 // ---- Field logic at shared edges ----
-// Single-size perimeters behave exactly like Classic. When the perimeter sits inside two neighbouring
+// Single-size perimeters use the base pick path below. When the perimeter sits inside two neighbouring
 // IFU perimeter ranges, the smaller valve is the default and ranked tie-breakers decide whether to step up.
 // This is Rodnie's field logic, not an Abbott claim. Heart Team decides.
 const CALC_LVL = { none: 0, mild: 1, moderate: 2, severe: 3, unknown: -1 };
@@ -601,7 +581,6 @@ function navitorGo() {
     const r = recommend(gather());
     window.__lastRec = r;
     renderResult(r);
-    showLogicUsed(r);
     const valve = document.getElementById("cValveSize");
     if (r.primary && valve && !valve.value) {
       valve.value = r.coPrimary ? (r.primary.size.size + " or " + r.coPrimary.size.size) : String(r.primary.size.size);
@@ -619,26 +598,6 @@ function navitorGo() {
   }
 }
 
-function showLogicUsed(r) {
-  const el = document.getElementById("result-logic");
-  if (!el) return;
-  const m = (r && r.logic) || "classic";
-  el.textContent = "Logic: " + LOGIC_LABEL[m] + (r && r.overlap ? " · shared edge " + r.overlap.small + "/" + r.overlap.large : "");
-  el.style.display = r && !r.error ? "" : "none";
-}
-
-// Re-run the current result after flipping the logic switch (stays on the Logic tab).
-function rerunResult() {
-  if (!window.__lastRec || window.__lastRec.error) return;
-  try {
-    const r = recommend(gather());
-    window.__lastRec = r;
-    renderResult(r);
-    showLogicUsed(r);
-    showDerivedDiameter(r);
-    colorFitMatrix(r);
-  } catch (e) {}
-}
 
 function colorFitMatrix(r) {
   if (!document.getElementById("fit-colors")) {
@@ -722,11 +681,6 @@ function init() {
   try {
     TOGGLES.forEach(function (id) { const el = document.getElementById(id); if (el) el.addEventListener("click", function () { setToggle(id, !isOn(id)); }); });
     resetToggles();
-  } catch (e) {}
-  try {
-    const sw = document.getElementById("logicMode");
-    if (sw) sw.addEventListener("click", function (e) { const b = e.target.closest("button"); if (!b) return; setLogicMode(b.dataset.v); rerunResult(); });
-    syncLogicSwitch();
   } catch (e) {}
   try { renderCharts(); } catch (e) {}
   const go = document.getElementById("btn-go");

@@ -8,18 +8,13 @@ Sources for ranges: Abbott Navitor Vision didactic TRN1006420 OUS VER A and publ
 The decision needs a **perimeter** (mm). A perimeter-derived diameter typed on its own is also accepted.
 Area and mean diameter are optional and are used as checks only.
 
-Also used when present: min/max diameter, STJ, SOV L/R/NC or SOV min width, LCA height, RCA height, LVOT, ascending aorta, access min diameter, annular / LVOT / STJ / cusp calcium grade, and (Field logic only) four optional toggles: eccentric leaflet calcium, protruding LVOT calcium, RBBB / short membranous septum / heavy septal calcium, small patient / low expected EOA (PPM concern).
+Also used when present: min/max diameter, STJ, SOV L/R/NC or SOV min width, LCA height, RCA height, LVOT, ascending aorta, access min diameter, annular / LVOT / STJ / cusp calcium grade, and four optional toggles: eccentric leaflet calcium, protruding LVOT calcium, RBBB / short membranous septum / heavy septal calcium, small patient / low expected EOA (PPM concern).
 
 SOV height is **not** used: not asked for, not scored, not flagged. The IFU range table (ARTMT600362847, Table 2) has no SOV height criterion, real-world users do not measure it, and the field was removed from the Size tab. SOV **diameter** is the root measurement used.
 
-## Logic modes
+## Logic
 
-The Logic tab has a switch, remembered on the phone (localStorage `navitorLogic`):
-
-- **Field logic (shared edges)**: default since v49. Rodnie's field logic, not an Abbott claim. Section 6.
-- **Classic**: the pre-v49 behaviour (tag `old-logic-v48`). Sections 5 and 7.
-
-Both modes are identical whenever the perimeter is inside one size's range only. They differ only on shared edges (66 · 72–73 · 79 · 85 mm). The Result tab shows which logic produced the result.
+The app uses **Field logic (shared edges)** only. Rodnie's field logic, not an Abbott claim. Section 5 covers the single-size pick; section 6 covers shared edges. The pre-field-logic behaviour is kept as the GitHub release [`old-logic-v48`](https://github.com/rodnieoro08/navitor-sizer/releases/tag/old-logic-v48).
 
 ## 1. Data-quality checks (flags only, never change the size)
 
@@ -97,7 +92,7 @@ Review flags with no score effect:
 - Entered mean Ø outside that size's mean-Ø band, shown only when the perimeter is in range for that size ("perimeter decides")
 - Perimeter-derived Ø outside that size's band (shown for any size where it falls outside)
 
-## 5. Pick (both modes; Classic at shared edges)
+## 5. Pick (single-size perimeters)
 
 - Eligible sizes sorted by score.
 - If top two scores differ by < 0.08 → **co-primary**. Do not force a single size.
@@ -111,7 +106,7 @@ Review flags with no score effect:
 
 Fit matrix colours on the Result tab: green = the single eligible (recommended) size; yellow = the second-highest-scoring size, or both sizes when two are eligible; red = everything else.
 
-## 6. Field logic at shared edges (default)
+## 6. Field logic at shared edges
 
 Rodnie's field logic, not an Abbott claim. Heart Team decides.
 
@@ -150,26 +145,9 @@ Decision:
 
 The same pattern is tested at 72.5, 79 and 85 mm (`tests/harness.js`).
 
-## 7. Classic boundary playbook
+## 7. Pre-field-logic archive
 
-Classic mode only. Reviewer guidance for reading the flags at an overlap. The app does not apply these as rules: it uses perimeter, perimeter-derived Ø, the hard excludes and the penalties above. Area and entered mean Ø appear only as flags.
-
-### 66 mm perimeter — 23 vs 25
-Prefer **25** when area ≥ 338, mean Ø ≥ 21, SOV ≥ 27, coronaries comfortable, STJ not tight.
-Prefer **23** when area still lives in 277–346, SOV < 27 or only just 27, LCA/RCA low, STJ calcium moderate+, or ellipticity < 0.73 with a small min diameter.
-
-### 72–73 mm — 25 vs 27
-27 needs SOV ≥ 29 and usually access ≥ 5.5.
-If area ≤ 415 and mean Ø ≤ 23, 25 is usually the cleaner IFU match.
-If area is already in 405–491 and mean Ø ≥ 23, 27 is preferred unless coronaries / STJ argue down.
-
-### 79 mm — 27 vs 29
-29 needs SOV ≥ 31 and AA 32–42.
-Do not upsize off a single 79 mm peri if coronaries are low or STJ < 29.
-
-### 85 mm — 29 vs 35
-35 needs SOV ≥ 34 and labelled mean Ø 27–30.
-35 AA window is wide (27–44). Still respect sinus width and coronary height.
+The pre-v49 shared-edge behaviour (score gap / co-primary at overlaps) is no longer selectable in the app. It is preserved as the GitHub release [`old-logic-v48`](https://github.com/rodnieoro08/navitor-sizer/releases/tag/old-logic-v48) if you need to go back.
 
 ## 8. Never
 

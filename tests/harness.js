@@ -5,15 +5,14 @@
  * drives the page the way a user does (fill inputs, click Recommend).
  * Records recommendation output + rendered result text for a fixed case set.
  *
- * Runs every case in both logic modes:
- *   classic -> tests/baseline.json        (pre-v49 behaviour; must stay identical)
- *   field   -> tests/baseline-field.json  (Field logic at shared edges, default since v49)
+ * Compares against tests/baseline-field.json (Field logic at shared edges).
+ * The pre-field-logic snapshot is archived as tests/baseline-classic-archived.json
+ * (GitHub release old-logic-v48).
  *
- *   node harness.js                       compare both modes against their baselines
- *   node harness.js --mode classic|field  only that mode
- *   node harness.js --write               (re)write the baseline(s)
- *   node harness.js --compare file        compare (single --mode) against another snapshot
- *   node harness.js --out file            just dump current output (single --mode)
+ *   node harness.js                       compare against baseline-field.json
+ *   node harness.js --write               (re)write baseline-field.json
+ *   node harness.js --compare file        compare against another snapshot
+ *   node harness.js --out file            just dump current output
  *
  * All inputs are synthetic. No patient data.
  */
@@ -108,8 +107,7 @@ function runCase(w, name, c) {
     cValveSize: (w.document.getElementById("cValveSize") || {}).value || "",
     summary: summarize(rec && rec.evals ? rec : (rec && rec.error ? rec : null)),
     resultText: body.textContent.replace(/\s+/g, " ").trim(),
-    rows,
-    ...(MODE === "field" ? { logicLine: (w.document.getElementById("result-logic") || {}).textContent || "" } : {})
+    rows
   };
 }
 
@@ -300,12 +298,9 @@ function liveButtonExamples(w) {
 }
 
 let harnessErrors = [];
-let MODE = "classic";
-async function collect(mode) {
-  MODE = mode;
+async function collect() {
   setInputs.missing = new Set();
   const { w, errors, scripts } = await boot();
-  w.localStorage.setItem("navitorLogic", mode);
   harnessErrors = errors;
   const result = { scripts, cases: {}, sweep: null, ocr: null, buttons: null };
   // Button examples run first on a pristine page
@@ -331,24 +326,15 @@ function diff(a, b) {
   return rows;
 }
 
-const BASE = { classic: path.join(__dirname, "baseline.json"), field: path.join(__dirname, "baseline-field.json") };
+const BASE = path.join(__dirname, "baseline-field.json");
 
 (async () => {
   const args = process.argv.slice(2);
   const arg = (n) => { const i = args.indexOf(n); return i >= 0 ? (args[i + 1] && !args[i + 1].startsWith("--") ? args[i + 1] : true) : null; };
-  const modes = arg("--mode") && arg("--mode") !== true ? [arg("--mode")] : ["classic", "field"];
-  for (const mode of modes) {
-    console.log(`=== mode: ${mode} ===`);
-    await runMode(mode, arg);
-  }
-})();
-
-async function runMode(mode, arg) {
-  const cur = await collect(mode);
-  const base = BASE[mode];
+  const cur = await collect();
   if (arg("--out")) { fs.writeFileSync(arg("--out"), JSON.stringify(cur, null, 1)); console.log("wrote", arg("--out")); return; }
-  if (arg("--write")) { const f = arg("--write") === true ? base : arg("--write"); fs.writeFileSync(f, JSON.stringify(cur, null, 1) + "\n"); console.log("wrote", f); return; }
-  const against = arg("--compare") && arg("--compare") !== true ? arg("--compare") : base;
+  if (arg("--write")) { const f = arg("--write") === true ? BASE : arg("--write"); fs.writeFileSync(f, JSON.stringify(cur, null, 1) + "\n"); console.log("wrote", f); return; }
+  const against = arg("--compare") && arg("--compare") !== true ? arg("--compare") : BASE;
   const prev = JSON.parse(fs.readFileSync(against, "utf8"));
   // `scripts` list legitimately changes when patch files are merged; exclude it from the diff
   const strip = (o) => { const c = JSON.parse(JSON.stringify(o)); delete c.scripts; return c; };
@@ -360,4 +346,4 @@ async function runMode(mode, arg) {
   console.log(`${rows.length} differing value(s) vs ${path.relative(process.cwd(), against)}:`);
   rows.slice(0, 200).forEach((r) => console.log(`  ${r.key}\n    before: ${JSON.stringify(r.before)}\n    after:  ${JSON.stringify(r.after)}`));
   process.exitCode = 1;
-}
+})();
