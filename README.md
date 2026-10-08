@@ -48,4 +48,8 @@ npm run smoke   # headless Chrome load + examples + Recommend (needs google-chro
 ```
 
 Set `CHROME=/path/to/chrome` if it is not at `/usr/bin/google-chrome`.
-`tests/baseline.json` holds synthetic inputs and outputs only. If you change sizing on purpose, run `npm run baseline` and review the diff.
+`npm test` runs every case in both logic modes: **Classic** against `tests/baseline.json` (must stay identical) and **Field logic (shared edges)** against `tests/baseline-field.json`. Both hold synthetic inputs and outputs only. If you change sizing on purpose, run `npm run baseline` and review the diff.
+
+## Logic modes
+
+The Logic tab has a switch between **Field logic (shared edges)** (default) and **Classic** (the pre-v49 behaviour, tag `old-logic-v48`). It is remembered per phone and needs no redeploy. Single-size perimeters are identical in both. See [DECISION_TREE.md](DECISION_TREE.md).
