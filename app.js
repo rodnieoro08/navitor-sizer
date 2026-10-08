@@ -494,7 +494,7 @@ function renderResult(r) {
     overlapHtml = `
       <div class="card overlap">
         <h2>Overlap explanation</h2>
-        <p class="hint">Field logic at shared edges (Rodnie's field rules, not an Abbott claim). Perimeter ${fmtN(o.periEq, 1)} mm sits in both ${o.small} and ${o.large} mm ranges. Perimeter-derived Ø ${o.pd.toFixed(1)} mm · circular annulus ≈ ${fmtN(o.circArea, 1)} mm² · oversizing ${o.oversize.map((x) => x.size + " ≈ " + fmtN(x.pct, 1) + "%").join(" · ")}. Default is the smaller valve.</p>
+        <p class="hint">Perimeter ${fmtN(o.periEq, 1)} mm sits in both ${o.small} and ${o.large} mm ranges. Perimeter-derived Ø ${o.pd.toFixed(1)} mm · circular annulus ≈ ${fmtN(o.circArea, 1)} mm² · oversizing ${o.oversize.map((x) => x.size + " ≈ " + fmtN(x.pct, 1) + "%").join(" · ")}. Default is the smaller valve.</p>
         <ol class="ov">${o.lines.map((l) => `<li><b>${l.title}</b> <span class="dir ${dirCls[l.dir]}">${l.dir}</span><div>${l.text}</div></li>`).join("")}</ol>
         <div class="flag ${o.stepped ? "warn" : "ok"}"><b>${o.choice} mm (${o.tag})</b>${o.why}</div>
       </div>`;
