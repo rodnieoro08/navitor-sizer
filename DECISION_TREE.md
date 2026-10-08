@@ -125,7 +125,7 @@ Tie-breakers, in rank order. Each is shown on the Result as *favours smaller / f
 2. **Annular area as a check on perimeter.** Area < larger size's area minimum → perimeter flatters the larger (eccentric annulus) → **veto larger**. Area inside both ranges → neutral. Area > smaller size's area maximum → the smaller has been left → favours larger.
 3. **SOV diameter.** Mean of L/R/NC, then the smallest sinus. Smallest < larger size's floor → **veto larger** (already a hard exclude). Mean or smallest < larger floor + 2 mm → **tight** for the larger (the frame is built larger than its label). **Genuinely uniform** = all three sinuses entered and max − min ≤ 2 mm. "SOV min width only" cannot confirm uniformity. No SOV entered = root not confirmed, treated as tight. A single narrow sinus keeps the smaller valve.
 4. **LVOT vs annulus.** LVOT < perimeter-derived diameter (1 dp) → constrains the larger inflow → favours smaller and blocks a step-up.
-5. **Coronary height & STJ.** Veto a size more often than they choose one. Any non-SOV hard exclude on the larger (coronary < 10 mm, ascending aorta window) → veto larger. STJ < larger label → favours smaller.
+5. **Coronary height & STJ.** Veto a size more often than they choose one. Any non-SOV hard exclude on the larger (coronary < 10 mm, ascending aorta window) → veto larger. STJ < larger label → favours smaller but does not block a step-up; if the app steps up anyway, it shows an "STJ alert" flag.
 6. **Conduction risk vs PPM.** RBBB / short membranous septum / heavy septal calcium → favours smaller and a higher implant, blocks a step-up. Small patient / low expected EOA → favours larger only if the root can take it (no veto, SOV entered and not tight).
 
 Decision:
