@@ -8,9 +8,9 @@ Sources for ranges: Abbott Navitor Vision didactic TRN1006420 OUS VER A and publ
 The decision needs a **perimeter** (mm). A perimeter-derived diameter typed on its own is also accepted.
 Area and mean diameter are optional and are used as checks only.
 
-Also used when present: min/max diameter, STJ, SOV L/R/NC or SOV min width, LCA height, RCA height, LVOT, ascending aorta, access min diameter, annular / LVOT / STJ / cusp calcium grade, and four optional toggles: eccentric leaflet calcium, protruding LVOT calcium, RBBB / short membranous septum / heavy septal calcium, small patient / low expected EOA (PPM concern).
+Also used when present: min/max diameter, STJ, SOV L/R/NC or SOV min width, LCA height, RCA height, LVOT, ascending aorta, access min diameter, annular / LVOT / STJ / cusp calcium grade, and four optional toggles: eccentric leaflet calcium, protruding LVOT calcium, RBBB / short membranous septum / heavy septal calcium, smaller valve would move predicted PPM from moderate to severe. Optional sinus height (alert only, see below).
 
-SOV height is **not** used: not asked for, not scored, not flagged. The IFU range table (ARTMT600362847, Table 2) has no SOV height criterion, real-world users do not measure it, and the field was removed from the Size tab. SOV **diameter** is the root measurement used.
+Sinus (SOV) height is **alert-only**: an optional field. Below 15 mm the Result shows a "Coronary risk (alert only)" flag to review coronary obstruction / re-access risk. It never changes the size, because the IFU range table (ARTMT600362847, Table 2) has no SOV height criterion. SOV **diameter** is the root measurement used for sizing.
 
 ## Logic
 
@@ -116,18 +116,18 @@ Applies when the perimeter is inside **both** neighbours' perimeter ranges (66 �
 
 Tie-breakers, in rank order. Each is shown on the Result as *favours smaller / favours larger / neutral / veto larger / not entered*:
 
-1. **Calcium burden & distribution (first).** Supports the larger: cusp or annular calcium moderate/severe, eccentric leaflet calcium, or LVOT calcium moderate/severe (not protruding). **Protruding LVOT calcium = veto larger** (rupture and conduction risk). None/mild = neutral.
+1. **Calcium burden & distribution (first).** Changed 9 Oct 2026 after medical director review. **More than mild** (cusp or annular moderate/severe, eccentric leaflet calcium, or LVOT moderate/severe) → favours smaller and **blocks a step-up** (annular/LVOT injury and conduction risk). **Mild or less** (at least one grade entered, nothing more than mild) → allows a step-up. **Protruding LVOT calcium = veto larger.** No grade entered → not a reason either way (on the tight path a step-up still needs calcium graded mild or less).
 2. **Annular area as a check on perimeter.** Area < larger size's area minimum → perimeter flatters the larger (eccentric annulus) → **veto larger**. Area inside both ranges → neutral. Area > smaller size's area maximum → the smaller has been left → favours larger.
 3. **SOV diameter.** Mean of L/R/NC, then the smallest sinus. Smallest < larger size's floor → **veto larger** (already a hard exclude). Mean or smallest < larger floor + 2 mm → **tight** for the larger (the frame is built larger than its label). **Genuinely uniform** = all three sinuses entered and max − min ≤ 2 mm. "SOV min width only" cannot confirm uniformity. No SOV entered = root not confirmed, treated as tight. A single narrow sinus keeps the smaller valve.
 4. **LVOT vs annulus.** LVOT < perimeter-derived diameter (1 dp) → constrains the larger inflow → favours smaller and blocks a step-up.
-5. **Coronary height & STJ.** Veto a size more often than they choose one. Any non-SOV hard exclude on the larger (coronary < 10 mm, ascending aorta window) → veto larger. STJ < larger label → favours smaller but does not block a step-up; if the app steps up anyway, it shows an "STJ alert" flag.
-6. **Conduction risk vs PPM.** RBBB / short membranous septum / heavy septal calcium → favours smaller and a higher implant, blocks a step-up. Small patient / low expected EOA → favours larger only if the root can take it (no veto, SOV entered and not tight).
+5. **Coronary height & STJ.** These push towards the smaller valve. Any non-SOV hard exclude on the larger (coronary < 10 mm, ascending aorta window) → veto larger. **STJ < larger label, or STJ calcium moderate/severe → blocks a step-up** (tight and roomy). When the STJ is the only thing stopping a step-up, the flag reads `Shared edge 23/25: chose the 23 because of the STJ` with an "STJ: chose the smaller valve" explanation.
+6. **Conduction risk vs PPM.** RBBB / short membranous septum / heavy septal calcium → favours smaller and a higher implant, blocks a step-up. "Smaller valve would move predicted PPM from moderate to severe" → favours larger only if the root can take it (no veto, SOV entered and not tight). The grade comes from the team's own EOA/BSA assessment; the app does not calculate it.
 
 Decision:
 
 - Any veto larger → **smaller**.
-- SOV tight (or not entered) → **smaller**, unless ALL of: calcium more than mild, area entered and ≥ larger's area minimum, LVOT entered and not smaller than the annulus, three uniform sinuses, no conduction-risk toggle.
-- SOV roomy → **step up** when (calcium supports it, or area > smaller's area maximum, or PPM concern) AND LVOT is not smaller than the annulus AND no conduction-risk toggle. Otherwise smaller.
+- **Tight** (or SOV not entered): step up only if ALL: calcium mild or less · area in the larger range · LVOT ≥ annulus · 3 sinuses within 2 mm · STJ OK · no conduction risk. Otherwise **smaller**.
+- **Roomy**: step up if there is a reason (calcium mild or less, area above the smaller range, or PPM moderate → severe) and no blocker (calcium more than mild, LVOT smaller than annulus, STJ, conduction risk). Otherwise **smaller**. Uniformity only matters when the SOV is tight.
 - If the smaller valve fails a hard limit and the larger passes, the larger is the only option.
 
 ### Worked example: 66 mm perimeter, SOV 27 mm
@@ -137,11 +137,13 @@ Decision:
 | Case | Result |
 |---|---|
 | (a) SOV 27/27/27, nothing else | 23 |
-| (b) + cusp moderate, area 360, LVOT 21.5, SOV 27/27/27.5 | 25 |
-| (c) as (b), SOV 27/27/31 (spread 4 mm) | 23 |
-| (d) as (b), SOV min width 27 only | 23 |
-| (e) as (b), LVOT 19 | 23 |
-| (f) as (b), area 330 (< 338) | 23 |
+| (b) + cusp moderate, area 360, LVOT 21.5, SOV 27/27/27.5 | 23 (calcium more than mild) |
+| (b′) as (b) with cusp mild | 25 |
+| (c) as (b′), SOV 27/27/31 (spread 4 mm) | 23 |
+| (d) as (b′), SOV min width 27 only | 23 |
+| (e) as (b′), LVOT 19 | 23 |
+| (f) as (b′), area 330 (< 338) | 23 (veto) |
+| (g) as (b′), STJ 24 mm (< 25 label) or STJ calcium moderate | 23 (chosen because of the STJ) |
 
 The same pattern is tested at 72.5, 79 and 85 mm (`tests/harness.js`).
 

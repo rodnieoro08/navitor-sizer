@@ -64,7 +64,7 @@ function setInputs(w, c) {
   Object.keys(c).forEach((k) => {
     if (CALCS.includes(k) || TOGGLES.includes(k)) return;
     const el = doc.getElementById(k);
-    if (el) el.value = String(c[k]);          // sovH may not exist as a field in the live page
+    if (el) el.value = String(c[k]);
     else (setInputs.missing = setInputs.missing || new Set()).add(k);
   });
   // peri-pd mount listens for "input" on peri
@@ -137,7 +137,7 @@ function namedCases() {
   [26, 27, 28, 29, 30, 31].forEach((s) => add(`peri 79 sovMin ${s}`, { peri: 79, sovMin: s }));
   [30, 31, 33, 34, 35, 36].forEach((s) => add(`peri 85 sovMin ${s}`, { peri: 85, sovMin: s }));
   add("peri 66 sov split L/R/NC min wins", { peri: 66, sovL: 30, sovR: 26.5, sovNC: 29 });
-  // SOV height (no field in live page; see PR)
+  // Sinus (SOV) height: optional field, alert-only below 15 mm, never changes the size
   [10, 14.9, 15, 16].forEach((h) => add(`peri 75 sovH ${h}`, { peri: 75, sovH: h }));
   add("example mid27 with sovH 12", { ...EX.mid27, sovH: 12 });
   add("example edge66 with sovH 14", { ...EX.edge66, sovH: 14 });

@@ -29,7 +29,7 @@ const SIZES = [
 const $ = (id) => document.getElementById(id);
 const num = (id) => {
   const el = document.getElementById(id);
-  if (!el) return null; // e.g. the SOV height field no longer exists
+  if (!el) return null; // field not on this page
   const v = parseFloat(el.value);
   return Number.isFinite(v) ? v : null;
 };
@@ -59,7 +59,7 @@ function gather() {
   return {
     peri: num("peri"), area: num("area"), periPD: num("periPD"),
     meanD: num("meanD"), minD: num("minD"), maxD: num("maxD"),
-    stj: num("stj"),
+    stj: num("stj"), sovH: num("sovH"),
     sovW: sovs.length ? Math.min.apply(null, sovs) : num("sovMin"),
     sovL, sovR, sovNC,
     lca: num("lca"), rca: num("rca"), lvot: num("lvot"),
@@ -187,7 +187,8 @@ function recommendClassic(d) {
 // This is Rodnie's field logic, not an Abbott claim. Heart Team decides.
 const CALC_LVL = { none: 0, mild: 1, moderate: 2, severe: 3, unknown: -1 };
 const SOV_ROOM = 2;      // mm above the larger size's SOV floor that still counts as "tight"
-const SOV_UNIFORM = 2;   // mm: max - min sinus for "genuinely uniform"
+const SOV_UNIFORM = 2;
+const SOV_H_WARN = 15;   // mm: sinus height below this shows a coronary-risk alert only (never changes the size)   // mm: max - min sinus for "genuinely uniform"
 
 function perimeterDerived(d) {
   return d.peri != null ? d.peri / Math.PI : (d.periPD != null ? Number(d.periPD) : null);
@@ -212,18 +213,19 @@ function fieldOverlap(d, evS, evL) {
   const lines = [];
   const add = (title, dir, text) => lines.push({ title: title, dir: dir, text: text });
 
-  // 1. Calcium burden & distribution
+  // 1. Calcium burden & distribution (MD review 9 Oct: more than mild favours the smaller; mild or less allows a step-up)
   const heavy = [];
   if (CALC_LVL[d.calcCusp] >= 2) heavy.push("cusp " + d.calcCusp);
   if (CALC_LVL[d.calcAnn] >= 2) heavy.push("annular " + d.calcAnn);
   if (d.eccLeaf) heavy.push("eccentric leaflet calcium");
   if (CALC_LVL[d.calcLvot] >= 2 && !d.protLvot) heavy.push("LVOT " + d.calcLvot);
   const calcEntered = [d.calcCusp, d.calcAnn, d.calcLvot].some((v) => v && v !== "unknown") || d.eccLeaf || d.protLvot;
-  const calcSupports = heavy.length > 0 && !d.protLvot;
+  const calcHeavy = heavy.length > 0 || !!d.protLvot;      // more than mild: blocks a step-up
+  const calcLow = calcEntered && !calcHeavy;                // mild or less: allows a step-up
   if (d.protLvot) add("Calcium burden & distribution", "veto larger", "Protruding LVOT calcium: rupture and conduction risk argue against the larger oversize.");
-  else if (heavy.length) add("Calcium burden & distribution", "favours larger", "More than mild: " + heavy.join(", ") + ". Supports the " + L.size + ".");
-  else if (calcEntered) add("Calcium burden & distribution", "neutral", "None or mild. No calcium reason to step up.");
-  else add("Calcium burden & distribution", "not entered", "No calcium grade entered.");
+  else if (heavy.length) add("Calcium burden & distribution", "favours smaller", "More than mild: " + heavy.join(", ") + ". Favours the " + S.size + " and blocks a step-up (annular/LVOT injury and conduction risk).");
+  else if (calcLow) add("Calcium burden & distribution", "favours larger", "None or mild. Allows a step-up to the " + L.size + ".");
+  else add("Calcium burden & distribution", "not entered", "No calcium grade entered. Not a reason either way.");
 
   // 2. Annular area as a check on perimeter
   if (d.area == null) add("Annular area vs perimeter", "not entered", "Area not entered. Circular " + fmtN(periEq, 1) + " mm annulus \u2248 " + fmtN(periEq * periEq / (4 * Math.PI), 1) + " mm\u00b2.");
@@ -264,10 +266,16 @@ function fieldOverlap(d, evS, evL) {
   let corDir = "not entered";
   if (otherHardL.length) { corDir = "veto larger"; corTxt.push(L.size + " excluded: " + otherHardL.join("; ") + "."); }
   if (!evS.eligible && evS.hard.length) corTxt.push(S.size + " excluded: " + evS.hard.join("; ") + ".");
+  const stjSmall = d.stj != null && d.stj < L.size;
+  const stjCalc = d.calcStj === "moderate" || d.calcStj === "severe";
+  const stjBlocks = [];
+  if (stjSmall) stjBlocks.push("STJ " + d.stj + " mm is smaller than the " + L.size + " mm label");
+  if (stjCalc) stjBlocks.push("STJ calcium " + d.calcStj);
   if (d.stj != null) {
-    if (d.stj < L.size) { if (corDir !== "veto larger") corDir = "favours smaller"; corTxt.push("STJ " + d.stj + " mm < " + L.size + " mm label."); }
+    if (stjSmall) { if (corDir !== "veto larger") corDir = "favours smaller"; corTxt.push("STJ " + d.stj + " mm < " + L.size + " mm label: blocks a step-up."); }
     else { if (corDir === "not entered") corDir = "neutral"; corTxt.push("STJ " + d.stj + " mm \u2265 " + L.size + " mm label."); }
   }
+  if (stjCalc) { if (corDir !== "veto larger") corDir = "favours smaller"; corTxt.push("STJ calcium " + d.calcStj + ": blocks a step-up."); }
   if (cors.length) {
     const mn = Math.min.apply(null, cors);
     if (mn >= 10) { if (corDir === "not entered") corDir = "neutral"; corTxt.push("Lowest coronary " + mn + " mm \u2265 10 mm."); }
@@ -280,40 +288,50 @@ function fieldOverlap(d, evS, evL) {
   const anyVetoSoFar = lines.some((l) => l.dir === "veto larger") || !evL.eligible;
   const rootTakes = !anyVetoSoFar && sovEntered && !sovTight;
   if (d.condRisk) add("Conduction risk vs PPM", "favours smaller", "RBBB / short membranous septum / heavy septal calcium: favours the " + S.size + " and a higher implant." + (d.ppm ? " PPM concern noted but conduction risk wins." : ""));
-  else if (d.ppm && rootTakes) add("Conduction risk vs PPM", "favours larger", "Small patient / low expected EOA, and the root can take the " + L.size + ".");
-  else if (d.ppm) add("Conduction risk vs PPM", "neutral", "PPM concern noted, but the root cannot take the " + L.size + " (SOV tight, not entered, or a veto).");
+  else if (d.ppm && rootTakes) add("Conduction risk vs PPM", "favours larger", "Smaller valve would move predicted PPM from moderate to severe, and the root can take the " + L.size + ".");
+  else if (d.ppm) add("Conduction risk vs PPM", "neutral", "Moderate-to-severe PPM concern noted, but the root cannot take the " + L.size + " (SOV tight, not entered, or a veto).");
   else add("Conduction risk vs PPM", "not entered", "No conduction or PPM concern entered.");
 
-  // Decision
+  // Decision. STJ < larger label or moderate/severe STJ calcium blocks a step-up (MD review 9 Oct).
   const veto = anyVetoSoFar;
-  let choice = "small", why;
+  let choice = "small", why, stjNote = null;
   if (veto) {
     why = "Veto on the " + L.size + ": " + lines.filter((l) => l.dir === "veto larger").map((l) => l.title).concat(!evL.eligible && !lines.some((l) => l.dir === "veto larger") ? ["hard exclude"] : []).join(", ") + ".";
   } else if (sovTight) {
     const miss = [];
-    if (!calcSupports) miss.push(calcEntered ? "calcium not more than mild" : "calcium not entered");
+    if (calcHeavy) miss.push("calcium more than mild");
+    else if (!calcLow) miss.push("calcium not entered");
     if (d.area == null) miss.push("area not entered");
     else if (d.area < L.area[0]) miss.push("area below " + L.area[0]);
     if (d.lvot == null) miss.push("LVOT not entered");
     else if (lvotSmall) miss.push("LVOT smaller than annulus");
     if (!uniform) miss.push(sovs.length === 3 ? "sinuses not uniform" : "uniform sinuses not confirmed (need all three)");
     if (d.condRisk) miss.push("conduction risk");
-    if (!miss.length) { choice = "large"; why = "SOV is tight for the " + L.size + ", but calcium is more than mild, area \u2265 " + L.area[0] + ", LVOT \u2265 annulus, and all three sinuses are uniform."; }
-    else why = (sovEntered ? "SOV is tight for the " + L.size + ". " : "") + "Not stepping up: " + miss.join("; ") + ".";
+    if (!miss.length && stjBlocks.length) {
+      why = "SOV is tight for the " + L.size + " and the other step-up conditions are met, but " + stjBlocks.join(" and ") + ". Chose the " + S.size + " because of the STJ.";
+      stjNote = "Chose the " + S.size + " because of the STJ: " + stjBlocks.join("; ") + ". Otherwise the " + L.size + " would have been chosen.";
+    } else if (!miss.length) { choice = "large"; why = "SOV is tight for the " + L.size + ", but calcium is mild or less, area \u2265 " + L.area[0] + ", LVOT \u2265 annulus, all three sinuses are uniform and the STJ allows it."; }
+    else why = (sovEntered ? "SOV is tight for the " + L.size + ". " : "") + "Not stepping up: " + miss.concat(stjBlocks).join("; ") + ".";
   } else {
     const reasons = [];
-    if (calcSupports) reasons.push("calcium more than mild");
+    if (calcLow) reasons.push("calcium mild or less");
     if (d.area != null && d.area > S.area[1]) reasons.push("area above the " + S.size + " range");
-    if (d.ppm) reasons.push("PPM concern");
+    if (d.ppm) reasons.push("PPM would go from moderate to severe on the " + S.size);
     const blocks = [];
+    if (calcHeavy) blocks.push("calcium more than mild");
     if (lvotSmall) blocks.push("LVOT smaller than annulus");
     if (d.condRisk) blocks.push("conduction risk");
-    if (reasons.length && !blocks.length) { choice = "large"; why = "SOV is roomy for the " + L.size + " and " + reasons.join(", ") + "."; }
-    else if (!reasons.length) why = "SOV is roomy, but nothing argues for the " + L.size + " (calcium, area or PPM).";
-    else why = "Would step up (" + reasons.join(", ") + "), but blocked: " + blocks.join(", ") + ".";
+    if (reasons.length && !blocks.length && stjBlocks.length) {
+      why = "SOV is roomy for the " + L.size + " (" + reasons.join(", ") + "), but " + stjBlocks.join(" and ") + ". Chose the " + S.size + " because of the STJ.";
+      stjNote = "Chose the " + S.size + " because of the STJ: " + stjBlocks.join("; ") + ". Otherwise the " + L.size + " would have been chosen.";
+    } else if (reasons.length && !blocks.length) { choice = "large"; why = "SOV is roomy for the " + L.size + " and " + reasons.join(", ") + "."; }
+    else if (!reasons.length && blocks.concat(stjBlocks).length) why = "SOV is roomy for the " + L.size + ", but not stepping up: " + blocks.concat(stjBlocks).join("; ") + ".";
+    else if (!reasons.length) why = "SOV is roomy, but nothing argues for the " + L.size + " (no calcium grade, area not above the " + S.size + " range, no PPM concern).";
+    else why = "Would step up (" + reasons.join(", ") + "), but blocked: " + blocks.concat(stjBlocks).join(", ") + ".";
   }
   if (choice === "large" && !evL.eligible) choice = "small";
   let flag = "Shared edge " + S.size + "/" + L.size + ": " + (choice === "large" ? "stepped up to " + L.size : "default " + S.size + (evL.eligible ? "" : " (" + L.size + " excluded)"));
+  if (choice === "small" && stjNote && evL.eligible) flag = "Shared edge " + S.size + "/" + L.size + ": chose the " + S.size + " because of the STJ";
   let tag = choice === "large" ? "stepped up" : "default";
   if (!evS.eligible && evL.eligible) {
     choice = "large"; tag = "only option";
@@ -321,11 +339,7 @@ function fieldOverlap(d, evS, evL) {
     why = "The " + S.size + " fails a hard limit, so the " + L.size + " is the only option at this edge.";
   }
   const chosen = choice === "large" ? L : S;
-  let stjAlert = null;
-  if (choice === "large" && d.stj != null && d.stj < L.size) {
-    stjAlert = "STJ " + d.stj + " mm is smaller than the " + L.size + " mm label. It does not stop the step-up, but check the STJ before choosing the " + L.size + ".";
-    why += " Alert: " + stjAlert;
-  }
+  const stjAlert = choice === "small" && stjNote && evL.eligible ? stjNote : null;
   return {
     small: S.size, large: L.size, choice: chosen.size, stepped: tag === "stepped up", tag: tag,
     pd: pdR, periEq: periEq, circArea: periEq * periEq / (4 * Math.PI),
@@ -446,6 +460,7 @@ function renderResult(r) {
   if (ell != null) why.push(["Ellipticity (min/max)", ell.toFixed(2) + (ell < 0.73 ? " ⚠" : " ✓")]);
   if (d.stj != null) why.push(["STJ", `${d.stj} mm`]);
   if (d.sovW != null) why.push(["SOV min width", `${d.sovW} mm`]);
+  if (d.sovH != null) why.push(["Sinus height", `${d.sovH} mm` + (d.sovH < SOV_H_WARN ? " ⚠" : "")]);
   if (d.lca != null || d.rca != null) why.push(["LCA / RCA height", `${fmt(d.lca)} / ${fmt(d.rca)} mm`]);
   if (d.lvot != null) why.push(["LVOT", `${d.lvot} mm`]);
   if (d.aa != null) why.push(["Ascending aorta", `${d.aa} mm`]);
@@ -455,7 +470,8 @@ function renderResult(r) {
 
   const flagHtml = [
     ...(r.overlap ? [`<div class="flag warn"><b>Field logic</b>${r.overlap.flag}</div>`] : []),
-    ...(r.overlap && r.overlap.stjAlert ? [`<div class="flag warn"><b>STJ alert</b>${r.overlap.stjAlert}</div>`] : []),
+    ...(r.overlap && r.overlap.stjAlert ? [`<div class="flag warn"><b>STJ: chose the smaller valve</b>${r.overlap.stjAlert}</div>`] : []),
+    ...(d.sovH != null && d.sovH < SOV_H_WARN ? [`<div class="flag warn"><b>Coronary risk (alert only)</b>Sinus height ${d.sovH} mm is below ${SOV_H_WARN} mm. Review coronary obstruction and coronary re-access risk (e.g. virtual valve in 3mensio). This does not change the recommended size.</div>`] : []),
     ...r.checks.map((f) => `<div class="flag warn"><b>Measurement check</b>${f}</div>`),
     ...(r.primary ? r.primary.hard.map((f) => `<div class="flag bad"><b>Hard constraint</b>${f}</div>`) : []),
     ...(r.primary ? r.primary.flags.filter((f) => !(r.overlap && r.overlap.stjAlert && /^STJ .* labelled diameter$/.test(f))).map((f) => `<div class="flag warn"><b>Review</b>${f}</div>`) : []),
@@ -521,7 +537,7 @@ function renderResult(r) {
 function loadExample(kind) {
   const set = (id, v) => { $(id).value = v ?? ""; };
   if (kind === "clear") {
-    ["peri","area","meanD","minD","maxD","stj","sovMin","sovL","sovR","sovNC","lca","rca","lvot","aa","access","notes"].forEach((id) => set(id, ""));
+    ["peri","area","meanD","minD","maxD","stj","sovMin","sovH","sovL","sovR","sovNC","lca","rca","lvot","aa","access","notes"].forEach((id) => set(id, ""));
     setCalc("calcAnn", "unknown"); setCalc("calcLvot", "unknown"); setCalc("calcStj", "unknown"); setCalc("calcCusp", "unknown");
     resetToggles();
     return;

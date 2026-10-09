@@ -52,7 +52,17 @@ const srv = http.createServer((q, r) => {
   }
   ok(await pg.evaluate(() => /Perimeter-derived diameter/.test(document.getElementById("mount-logic").textContent)), "Logic fragment mounted");
   ok(await pg.evaluate(() => /Rodnie.s field logic, not an Abbott claim/.test(document.getElementById("mount-logic").textContent)), "field-logic disclaimer present");
-  ok(!(await pg.evaluate(() => [...document.querySelectorAll("label, input, #result-body")].some((e) => /SOV height/i.test(e.textContent + " " + (e.placeholder || "") + " " + (e.id || ""))) || !!document.getElementById("sovH"))), "no SOV height input, label or result text");
+  // Sinus height: optional, alert-only (< 15 mm), never changes the size
+  ok(await pg.evaluate(() => !!document.getElementById("sovH")), "sinus height field present");
+  for (const [h, alert] of [[12, true], [15, false]]) {
+    await pg.evaluate(() => { showScreen("input"); document.getElementById("btn-clear").click(); });
+    await pg.click("[data-ex=mid27]");
+    await pg.evaluate((v) => { document.getElementById("sovH").value = String(v); }, h);
+    await pg.click("#btn-go");
+    const r = await pg.evaluate(() => ({ size: (document.querySelector("#result-body .result-hero .size") || {}).textContent, alert: /Coronary risk \(alert only\)/.test(document.getElementById("result-body").textContent) }));
+    ok(r.size && r.size.trim().startsWith("27") && r.alert === alert, `sinus height ${h} mm: size 27 unchanged, alert ${alert ? "shown" : "absent"} (got ${r.size && r.size.trim()}, ${r.alert})`);
+  }
+  ok(await pg.evaluate(() => /moderate to severe/.test(document.getElementById("tPpm").textContent)), "PPM chip renamed");
   ok(errors.length === 0, "no console/page errors" + (errors.length ? ": " + errors.join(" | ") : ""));
   ok(missing.length === 0, "no 4xx on local assets" + (missing.length ? ": " + missing.join(" | ") : ""));
   await b.close(); srv.close();

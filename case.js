@@ -251,6 +251,8 @@ function pullFromSize() {
   if (access) $("cAccess").value = access;
   if (sovL || sovR || sovNC) $("cSov").value = [sovL && `L ${sovL}`, sovR && `R ${sovR}`, sovNC && `NC ${sovNC}`].filter(Boolean).join(" / ");
   else if (sovMin) $("cSov").value = sovMin;
+  const sovH = $("sovH") ? $("sovH").value : "";
+  if (sovH && $("cSov").value && !/height/.test($("cSov").value)) $("cSov").value += " · height " + sovH;
   const rec = window.__lastRec;
   if (rec && rec.primary && !$("cValveSize").value) {
     $("cValveSize").value = rec.coPrimary
